@@ -5,7 +5,7 @@ div.pp_default .pp_top .pp_right{background:url(../images/prettyPhoto/default/sp
 div.pp_default .pp_content .ppt{color:#f8f8f8}
 div.pp_default .pp_content_container .pp_left{background:url(../images/prettyPhoto/default/sprite_y.png) -7px 0 repeat-y;padding-left:13px}
 div.pp_default .pp_content_container .pp_right{background:url(../images/prettyPhoto/default/sprite_y.png) top right repeat-y;padding-right:13px}
-div.pp_default .pp_next:hover{background:url(../images/prettyPhoto/default/sprite_next.png) center right no-repeat;cursor:pointer}
+div.pp_default .pp_next:hover{content: "<";} center right no-repeat;cursor:pointer}
 div.pp_default .pp_previous:hover{background:url(../images/prettyPhoto/default/sprite_prev.png) center left no-repeat;cursor:pointer}
 div.pp_default .pp_expand{background:url(../images/prettyPhoto/default/sprite.png) 0 -29px no-repeat;cursor:pointer;width:28px;height:28px}
 div.pp_default .pp_expand:hover{background:url(../images/prettyPhoto/default/sprite.png) 0 -56px no-repeat;cursor:pointer}
@@ -198,8 +198,8 @@ a.pp_next:before {
 	transition: all 0.3s ease-in-out; 
 	-webkit-transition: all 0.3s ease-in-out;
 }
-a.pp_previous:before {content: "\f104"; left:0;}
-a.pp_next:before {content: "\f105"; right:0;}
+a.pp_previous:before {content: "<"; left:0;}
+a.pp_next:before {content: ">"; right:0;}
 a.pp_previous:hover:before, a.pp_next:hover:before {color:#fff;}
 
 .pp_gallery {margin-top:20px;}
