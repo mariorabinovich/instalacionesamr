@@ -1,7 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <url>
-    <loc>https://www.instalacionesamr.com.ar/index.htm</loc>
-    <lastmod>2022-10-04</lastmod>
-  </url>
+<urlset
+      xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+<url>
+  <loc>https://instalacionesamr.com.ar/</loc>
+  <lastmod>2024-10-22T21:28:10+00:00</lastmod>
+  <priority>1.00</priority>
+</url>
+<url>
+  <loc>https://instalacionesamr.com.ar/index.htm</loc>
+  <lastmod>2024-10-22T21:28:10+00:00</lastmod>
+  <priority>0.80</priority>
+</url>
+<url>
+  <loc>https://instalacionesamr.com.ar/portfolio.html</loc>
+  <lastmod>2024-10-22T21:28:10+00:00</lastmod>
+  <priority>0.80</priority>
+</url>
+
+
 </urlset>
