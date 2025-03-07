@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Acceso Restringido</title>
+    <script>
+        function verificarPassword() {
+            var password = document.getElementById("password").value;
+            if (password === "@amr") {
+                document.getElementById("link-container").style.display = "block";
+                document.getElementById("form-container").style.display = "none";
+            } else {
+                alert("Contraseña incorrecta. Inténtalo de nuevo.");
+            }
+        }
+    </script>
+</head>
+<body>
+    <div id="form-container">
+        <h2>Ingrese la contraseña para acceder al archivo</h2>
+        <input type="password" id="password" placeholder="Contraseña">
+        <button onclick="verificarPassword()">Ingresar</button>
+    </div>
+    <div id="link-container" style="display: none;">
+        <h2>Acceso concedido</h2>
+        <a href="IS_Plantilla.dwg" download>Descargar IS_Plantilla.dwg</a>
+    </div>
+</body>
+</html>
