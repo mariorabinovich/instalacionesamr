@@ -7,11 +7,12 @@
     <script>
         function verificarPassword() {
             var password = document.getElementById("password").value;
-            if (password = MRA) {
+            if (password.trim() === "@amr") {
                 document.getElementById("link-container").style.display = "block";
                 document.getElementById("form-container").style.display = "none";
             } else {
                 alert("Contraseña incorrecta. Inténtalo de nuevo.");
+                document.getElementById("password").value = "";
             }
         }
     </script>
