@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Práctica Interactiva - Evaluación Técnica</title>
+    <style>
+        /* ================= ESTILOS GENERALES ================= */
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f4f6f9; margin: 0; padding: 20px; color: #333; }
+        .container { max-width: 850px; margin: 0 auto; background: white; padding: 40px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+        
+        /* Encabezados */
+        h1 { text-align: center; color: #2c3e50; margin-bottom: 5px; text-transform: uppercase; letter-spacing: 1px; }
+        .subtitle { text-align: center; color: #7f8c8d; margin-bottom: 30px; font-weight: 300; }
+        .exam-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #3498db; padding-bottom: 15px; margin-bottom: 20px; }
+        .tema-badge { background-color: #3498db; color: white; padding: 5px 15px; border-radius: 20px; font-weight: bold; font-size: 0.9em; }
+
+        /* Menú Principal */
+        .menu-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; }
+        .menu-btn { 
+            padding: 30px; font-size: 1.3rem; color: white; border: none; border-radius: 10px; cursor: pointer; 
+            transition: transform 0.2s, box-shadow 0.2s; box-shadow: 0 4px 6px rgba(0,0,0,0.1); font-weight: bold;
+        }
+        .btn-acustica { background: linear-gradient(135deg, #3498db, #2980b9); }
+        .btn-lumi { background: linear-gradient(135deg, #f1c40f, #e67e22); }
+        .menu-btn:hover { transform: translateY(-3px); box-shadow: 0 6px 12px rgba(0,0,0,0.15); }
+
+        /* Preguntas */
+        #seccion-quiz { display: none; }
+        .question-block { margin-bottom: 20px; padding: 20px; border: 1px solid #e1e4e8; border-radius: 8px; background-color: #fff; page-break-inside: avoid; }
+        .question-title { font-weight: bold; font-size: 1.1em; margin-bottom: 12px; display: block; color: #2c3e50; }
+        
+        .options label { display: block; padding: 10px; margin-bottom: 5px; cursor: pointer; border-radius: 5px; border: 1px solid transparent; transition: background 0.2s; }
+        .options label:hover { background-color: #f8f9fa; border-color: #dee2e6; }
+        input[type="radio"] { margin-right: 12px; }
+
+        /* Botones */
+        .btn-container { margin-top: 30px; display: flex; gap: 10px; flex-wrap: wrap; }
+        .action-btn { flex: 1; padding: 15px; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 1rem; color: white; transition: background 0.3s; }
+        .btn-evaluar { background-color: #27ae60; } .btn-evaluar:hover { background-color: #219150; }
+        .btn-volver { background-color: #7f8c8d; } .btn-volver:hover { background-color: #6c757d; }
+        .btn-pdf { background-color: #e74c3c; display: none; } .btn-pdf:hover { background-color: #c0392b; }
+
+        /* Feedback (Explicaciones) */
+        .feedback { margin-top: 15px; padding: 15px; border-radius: 6px; font-size: 0.95em; display: none; border-left: 5px solid transparent; }
+        .feedback p { margin: 0 0 5px 0; }
+        .correct { background-color: #d4edda; color: #155724; border-left-color: #28a745; }
+        .incorrect { background-color: #fff3cd; color: #856404; border-left-color: #ffc107; } /* Amarillo alerta para explicación */
+        .incorrect-label { color: #dc3545; font-weight: bold; }
+        
+        .explanation-title { font-weight: bold; display: block; margin-bottom: 5px; text-decoration: underline; }
+
+        /* Resultado Final */
+        #resultado-final { text-align: center; font-size: 1.4rem; margin-top: 30px; padding: 20px; display: none; border-radius: 8px; font-weight: bold; border: 2px solid #ccc; }
+
+        /* ================= IMPRESIÓN (PDF) ================= */
+        @media print {
+            body { background-color: white; padding: 0; font-size: 12pt; }
+            .container { box-shadow: none; max-width: 100%; padding: 0; margin: 0; }
+            #seccion-menu, .btn-container, .subtitle { display: none !important; }
+            #seccion-quiz { display: block !important; }
+            h1 { font-size: 18pt; margin-bottom: 10px; }
+            
+            /* Colores forzados */
+            .correct { -webkit-print-color-adjust: exact; print-color-adjust: exact; background-color: #f0fff4 !important; border: 1px solid #ccc; }
+            .incorrect { -webkit-print-color-adjust: exact; print-color-adjust: exact; background-color: #fffbf0 !important; border: 1px solid #ccc; }
+            #resultado-final { -webkit-print-color-adjust: exact; print-color-adjust: exact; display: block !important; border: 2px solid #000; }
+            
+            .question-block { border: none; border-bottom: 1px solid #eee; margin-bottom: 15px; padding: 10px 0; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    
+    <div id="seccion-menu">
+        <h1>Práctica</h1>
+        <p class="subtitle">Seleccione el módulo técnico a evaluar</p>
+        
+        <div class="menu-grid">
+            <button class="menu-btn btn-acustica" onclick="iniciarExamen('acustica')">
+                🔊 Acústica
+            </button>
+            <button class="menu-btn btn-lumi" onclick="iniciarExamen('luminotecnia')">
+                💡 Luminotecnia
+            </button>
+        </div>
+        <p style="text-align: center; margin-top: 40px; color: #999; font-size: 0.9em;">
+            El sistema generará un examen aleatorio con 10 preguntas y sus respectivas justificaciones técnicas.
+        </p>
+    </div>
+
+    <div id="seccion-quiz">
+        <div class="exam-header">
+            <h2 id="titulo-tema" style="margin:0;">Materia</h2>
+            <span id="badge-tema" class="tema-badge">TEMA 1</span>
+        </div>
+
+        <form id="quizForm">
+            <div id="quiz-container"></div>
+            
+            <div class="btn-container">
+                <button type="button" id="btn-eval" class="action-btn btn-evaluar" onclick="verificarRespuestas()">✅ Evaluar y Ver Explicaciones</button>
+                <button type="button" id="btn-pdf" class="action-btn btn-pdf" onclick="window.print()">📄 Descargar Resultados (PDF)</button>
+                <button type="button" id="btn-back" class="action-btn btn-volver" onclick="volverAlMenu()">⬅ Volver al Menú</button>
+            </div>
+        </form>
+        
+        <div id="resultado-final"></div>
+    </div>
+
+</div>
+
+<script>
+    /* =========================================================
+       BASE DE DATOS CON EXPLICACIONES (exp)
+       ========================================================= */
+    const bancoPreguntas = {
+        acustica: [
+            { p: "¿Cuál es la definición física del sonido?", ops: ["Onda electromagnética.", "Onda mecánica longitudinal.", "Flujo de partículas.", "Onda transversal."], c: 1, exp: "El sonido es una perturbación mecánica que necesita un medio material (aire, agua, sólido) para propagarse. Es longitudinal porque las partículas vibran en la misma dirección que la onda." },
+            { p: "¿Qué cualidad subjetiva determina la frecuencia?", ops: ["Timbre", "Intensidad", "Altura o Tono", "Duración"], c: 2, exp: "La frecuencia física (Hz) se percibe subjetivamente como la Altura o Tono. A mayor frecuencia, sonido más agudo; a menor frecuencia, más grave." },
+            { p: "¿Rango audible promedio del humano?", ops: ["20 Hz - 20 kHz", "0 Hz - 1 kHz", "100 Hz - 10 kHz", "5 Hz - 50 kHz"], c: 0, exp: "El oído humano sano percibe frecuencias entre 20 Hz y 20.000 Hz (20 kHz). Por debajo son infrasonidos y por encima ultrasonidos." },
+            { p: "¿Qué percibimos al aumentar la amplitud?", ops: ["Tono más agudo", "Mayor volumen", "Mayor velocidad", "Cambio de timbre"], c: 1, exp: "La amplitud de la onda está directamente relacionada con la energía y la presión sonora, lo cual percibimos como Intensidad o 'Volumen'." },
+            { p: "¿Dónde viaja más rápido el sonido?", ops: ["Aire", "Agua", "Acero", "Vacío"], c: 2, exp: "El sonido viaja más rápido en medios más densos y elásticos. En el acero (~5000 m/s) viaja mucho más rápido que en agua (~1500 m/s) o aire (~340 m/s)." },
+            { p: "¿Unidad del Nivel de Presión Sonora?", ops: ["Hz", "Watts", "Pascales", "Decibeles (dB)"], c: 3, exp: "El Decibel (dB) es la unidad logarítmica usada para medir el nivel de presión sonora, comparando la presión medida con una presión de referencia auditiva." },
+            { p: "¿Qué es la Resonancia?", ops: ["Vibración por coincidencia de frecuencia natural.", "Anulación de ondas.", "Reflexión del sonido.", "Cambio de tono por movimiento."], c: 0, exp: "La resonancia ocurre cuando una fuerza externa impulsa a un sistema a oscilar a su frecuencia natural, aumentando drásticamente la amplitud." },
+            { p: "¿Diferencia clave entre Eco y Reverberación?", ops: ["El tipo de superficie.", "La frecuencia.", "El tiempo de retardo (>0.1s).", "No hay diferencia."], c: 2, exp: "Físicamente es el mismo fenómeno (reflexión), pero si el retardo es mayor a ~0.1s (aprox 17m), el oído distingue dos sonidos separados (Eco). Si es menor, se suman (Reverberación)." },
+            { p: "¿Qué distingue la misma nota en distintos instrumentos?", ops: ["Frecuencia", "Intensidad", "Longitud de onda", "Timbre"], c: 3, exp: "El timbre depende de la composición de armónicos de la onda. Aunque la frecuencia fundamental sea la misma (la misma nota), los armónicos hacen que suenen distinto." },
+            { p: "¿Efecto Doppler al acercarse la fuente?", ops: ["Sonido más grave", "Sonido más agudo", "Menos volumen", "Mayor velocidad"], c: 1, exp: "Al acercarse la fuente, las ondas se 'comprimen' frente a ella, llegando con mayor frecuencia al observador, percibiéndose más agudo." },
+            { p: "¿Cuál es el umbral de dolor auditivo aproximado?", ops: ["60 dB", "90 dB", "120-140 dB", "200 dB"], c: 2, exp: "Alrededor de los 120-130 dB la sensación auditiva comienza a convertirse en dolor físico y daño inmediato." },
+            { p: "¿Puede el sonido viajar en el vacío?", ops: ["Sí, a baja velocidad.", "No, necesita un medio material.", "Sí, si es alta frecuencia.", "Depende de la temperatura."], c: 1, exp: "El sonido es una onda mecánica, lo que significa que requiere vibración de materia (átomos/moléculas). En el vacío no hay nada que vibre." },
+            { p: "¿Qué es un Infrasonido?", ops: ["Sonido muy fuerte.", "Frecuencia superior a 20.000 Hz.", "Frecuencia inferior a 20 Hz.", "Sonido dentro del agua."], c: 2, exp: "Los infrasonidos son frecuencias por debajo del umbral de audición humano (menos de 20 Hz), producidos por sismos, elefantes, etc." },
+            { p: "¿Qué es un Ultrasonido?", ops: ["Frecuencia superior a 20.000 Hz.", "Frecuencia inferior a 20 Hz.", "Sonido digital.", "Ruido blanco."], c: 0, exp: "Frecuencias por encima del límite humano superior (20 kHz). Usados en ecografías y sonares." },
+            { p: "¿Qué material es mejor aislante acústico?", ops: ["Vidrio simple", "Hormigón armado", "Lana de roca/vidrio", "Metal"], c: 2, exp: "Los materiales porosos y fibrosos como la lana de vidrio atrapan el aire y disipan la energía sonora por fricción, siendo excelentes absorbentes/aislantes." },
+            { p: "¿Cómo se llama el tiempo que tarda una onda en completar un ciclo?", ops: ["Frecuencia", "Periodo", "Amplitud", "Longitud"], c: 1, exp: "El Periodo (T) es el tiempo en segundos que dura un ciclo completo. Es el inverso de la frecuencia (T = 1/f)." },
+            { p: "¿La velocidad del sonido en el aire depende principalmente de...?", ops: ["La frecuencia.", "La intensidad.", "La temperatura del aire.", "El volumen de la fuente."], c: 2, exp: "La velocidad varía con la temperatura: aumenta aprox. 0.6 m/s por cada grado Celsius que sube la temperatura." },
+            { p: "¿Qué es la longitud de onda?", ops: ["La altura de la onda.", "Distancia entre dos crestas consecutivas.", "Número de ciclos por segundo.", "El tiempo de vibración."], c: 1, exp: "Es la distancia física que recorre la onda en un ciclo completo. Se representa con la letra griega lambda (λ)." },
+            { p: "¿A qué frecuencia vibra la nota La (A4) estándar?", ops: ["256 Hz", "432 Hz", "440 Hz", "1000 Hz"], c: 2, exp: "El estándar internacional de afinación ISO 16 fija la nota La4 en 440 Hz." },
+            { p: "¿Qué parte del oído convierte la vibración en impulsos nerviosos?", ops: ["Tímpano", "Martillo", "Cóclea (Caracol)", "Pabellón auricular"], c: 2, exp: "La cóclea contiene las células ciliadas que transforman la energía mecánica de la vibración en señales eléctricas para el cerebro." },
+            { p: "¿Qué sucede con el sonido al pasar del aire al agua?", ops: ["Aumenta su velocidad.", "Disminuye su velocidad.", "Mantiene su velocidad.", "Se detiene."], c: 0, exp: "Al pasar a un medio más denso como el agua, el sonido acelera drásticamente (de 340 m/s a 1500 m/s aprox)." },
+            { p: "¿Qué es el ruido rosa?", ops: ["Un sonido agudo.", "Ruido con igual energía por octava.", "Ausencia de sonido.", "Un tono puro."], c: 1, exp: "El ruido rosa se utiliza para calibración acústica porque tiene la misma energía en cada octava, asemejándose más a cómo oye el humano." },
+            { p: "Si duplicamos la distancia a la fuente, la intensidad...", ops: ["Se duplica.", "Se reduce a la mitad.", "Se reduce a la cuarta parte.", "No cambia."], c: 2, exp: "Ley de la Inversa del Cuadrado: La intensidad decae con el cuadrado de la distancia (1/2² = 1/4)." },
+            { p: "¿Qué es la difracción del sonido?", ops: ["Rebote en una pared.", "Capacidad de rodear obstáculos.", "Absorción por materiales.", "Cambio de frecuencia."], c: 1, exp: "La difracción es la propiedad de las ondas de curvarse para rodear obstáculos o pasar por rendijas, especialmente si la longitud de onda es comparable al obstáculo." },
+            { p: "Un sonido de 10 Hz es...", ops: ["Audible y agudo.", "Audible y grave.", "Ultrasónico.", "Infrasónico (no audible)."], c: 3, exp: "Al ser menor a 20 Hz, está fuera del rango de percepción humana y se clasifica como infrasonido." },
+            { p: "¿Qué magnitud se mide en Hertz?", ops: ["Intensidad", "Potencia", "Frecuencia", "Presión"], c: 2, exp: "El Hertz (Hz) mide ciclos por segundo, que es la definición de Frecuencia." },
+            { p: "¿El 'Volumen' que movemos en la radio modifica...?", ops: ["La Frecuencia.", "La Amplitud.", "La Longitud de Onda.", "El Periodo."], c: 1, exp: "Subir el volumen significa aumentar la potencia de salida, lo que incrementa la Amplitud de la onda sonora." },
+            { p: "¿Qué es la contaminación acústica?", ops: ["Ruido excesivo que afecta la salud.", "Música a bajo volumen.", "Uso de auriculares.", "Grabar audio."], c: 0, exp: "Se define como el exceso de sonido que altera las condiciones normales del ambiente y puede causar daños fisiológicos o psicológicos." },
+            { p: "¿El sonido es una onda...?", ops: ["Bidimensional.", "Unidimensional.", "Tridimensional (esférica).", "Cuatridimensional."], c: 2, exp: "En un medio abierto, el sonido se propaga en todas las direcciones del espacio, formando frentes de onda esféricos (3D)." },
+            { p: "¿Qué instrumento mide el nivel sonoro?", ops: ["Luxómetro", "Sonómetro", "Multímetro", "Barómetro"], c: 1, exp: "El sonómetro es el instrumento diseñado para medir niveles de presión sonora de forma objetiva, generalmente en decibeles." }
+        ],
+        luminotecnia: [
+            { p: "Unidad del Flujo Luminoso", ops: ["Lux", "Candela", "Lumen", "Watt"], c: 2, exp: "El Lumen (lm) mide la cantidad total de luz visible emitida por una fuente. Lux es para luz recibida, Candela para intensidad en una dirección." },
+            { p: "¿Qué medimos en Lux?", ops: ["Iluminancia (luz que llega).", "Luminancia (brillo).", "Flujo total.", "Potencia."], c: 0, exp: "El Lux mide la Iluminancia: cuántos lúmenes caen sobre un metro cuadrado de superficie." },
+            { p: "¿Qué es la Eficacia Luminosa?", ops: ["Vida útil.", "Relación Lúmenes por Watt (lm/W).", "Calidad de color.", "Calor emitido."], c: 1, exp: "Indica qué tan eficiente es la lámpara convirtiendo electricidad en luz. A mayor lm/W, más ahorro de energía." },
+            { p: "Ley inversa del cuadrado: Doble distancia implica...", ops: ["1/2 de luz.", "1/4 de luz.", "Misma luz.", "Doble luz."], c: 1, exp: "La luz se dispersa en un área mayor. Si la distancia es x2, la iluminación es 1/(2²) = 1/4." },
+            { p: "¿Qué define luz cálida o fría?", ops: ["CRI", "Frecuencia", "Temperatura de Color (K)", "Voltaje"], c: 2, exp: "La Temperatura de Color correlacionada, medida en Kelvin, define el tono: ~3000K es cálida (amarilla), ~6000K es fría (azulada)." },
+            { p: "¿Tecnología basada en semiconductores?", ops: ["Incandescente", "Halógena", "Fluorescente", "LED"], c: 3, exp: "LED significa Diodo Emisor de Luz. Es un componente electrónico semiconductor que emite fotones al pasar corriente." },
+            { p: "¿Qué es el CRI o IRC?", ops: ["Ahorro energético.", "Fidelidad en reproducción de colores.", "Tono de luz.", "Intensidad."], c: 1, exp: "El Índice de Reproducción Cromática (0-100) mide qué tan fieles se ven los colores bajo esa luz comparado con la luz natural." },
+            { p: "Diferencia Iluminancia vs Luminancia", ops: ["Iluminancia incide, Luminancia es brillo percibido.", "Son iguales.", "Luminancia es calor.", "Iluminancia es flujo."], c: 0, exp: "Iluminancia es la luz que 'cae' en la mesa. Luminancia es la luz que 'sale' de la mesa hacia tu ojo (lo que ves como brillo)." },
+            { p: "¿Qué es el deslumbramiento?", ops: ["Poca luz.", "Brillo excesivo molesto.", "Parpadeo.", "Sombra."], c: 1, exp: "Es una condición visual molesta causada por una luminancia excesiva o contrastes extremos que reducen la visibilidad." },
+            { p: "Eficiencia aprox. de incandescente", ops: ["90%", "50%", "<10% (resto calor)", "100%"], c: 2, exp: "Las bombillas viejas desperdician más del 90% de la energía como calor (infrarrojo), por eso fueron prohibidas en muchos lugares." },
+            { p: "¿Qué instrumento mide la iluminancia?", ops: ["Sonómetro", "Luxómetro", "Amperímetro", "Termómetro"], c: 1, exp: "El luxómetro posee un sensor calibrado para medir la luz incidente en una superficie según la sensibilidad del ojo humano." },
+            { p: "¿Qué temperatura de color es luz día (neutra/fría)?", ops: ["2700 K", "3000 K", "5500 K - 6500 K", "1000 K"], c: 2, exp: "La luz del sol al mediodía ronda los 5500K-6500K. Los valores bajos (3000K) son luces amarillentas tipo atardecer." },
+            { p: "¿Qué significa que una lámpara sea 'omnidireccional'?", ops: ["Emite luz hacia abajo.", "Emite luz en todas direcciones.", "Es un láser.", "Solo ilumina techos."], c: 1, exp: "Omni significa 'todo'. Emite luz en 360 grados (o casi), ideal para iluminación general." },
+            { p: "¿Cuál es la unidad de Intensidad Luminosa?", ops: ["Lumen", "Lux", "Candela", "Joule"], c: 2, exp: "La Candela (cd) es la unidad base del SI. Mide la 'fuerza' de la luz en una dirección específica." },
+            { p: "¿Qué tipo de lámpara usa vapor de mercurio?", ops: ["Descarga", "Incandescente", "LED", "Halógena"], c: 0, exp: "Las lámparas de descarga generan luz mediante un arco eléctrico a través de un gas (mercurio, sodio, etc.)." },
+            { p: "El espectro visible va aprox. de...", ops: ["10nm a 100nm", "380nm a 780nm", "1mm a 1m", "1000nm a 2000nm"], c: 1, exp: "El ojo humano solo detecta longitudes de onda electromagnética entre ~380nm (violeta) y ~780nm (rojo)." },
+            { p: "¿Qué es la vida útil de una lámpara?", ops: ["Hasta que se rompe el vidrio.", "Tiempo hasta que el flujo cae a un % (ej 70%).", "Tiempo total enchufada.", "Garantía de fábrica."], c: 1, exp: "En LED, no suelen fundirse de golpe. La vida útil (L70) es el tiempo hasta que la luz emitida baja al 70% de la original." },
+            { p: "¿Qué es un driver en iluminación LED?", ops: ["El disipador de calor.", "El chip que da luz.", "La fuente de alimentación electrónica.", "El casquillo."], c: 2, exp: "Los LEDs funcionan con corriente continua y bajo voltaje. El driver convierte la corriente alterna de la red (220V/110V) a lo que necesita el chip." },
+            { p: "Si una superficie es negra, ¿qué hace con la luz?", ops: ["La refleja toda.", "La absorbe casi toda.", "La transmite.", "La amplifica."], c: 1, exp: "El color negro se define físicamente por la absorción de casi todo el espectro visible, reflejando muy poco al ojo." },
+            { p: "La reflexión especular ocurre en...", ops: ["Superficies rugosas.", "Superficies pulidas (espejos).", "Superficies negras.", "El aire."], c: 1, exp: "Ocurre en superficies lisas donde el ángulo de incidencia es igual al de reflexión, creando una imagen nítida (espejo)." },
+            { p: "¿Qué lámpara tarda más en encender al 100%?", ops: ["LED", "Halógena", "Descarga (Mercurio/Sodio)", "Incandescente"], c: 2, exp: "Las lámparas de descarga de alta intensidad requieren calentar los gases internos, tardando varios minutos en dar toda su luz." },
+            { p: "¿Qué es la contaminación lumínica?", ops: ["Luz que emite calor.", "Luz artificial innecesaria hacia el cielo.", "Uso de LEDs baratos.", "Falta de luz en calles."], c: 1, exp: "Es la emisión de flujo luminoso de fuentes artificiales nocturnas en intensidades, direcciones o rangos espectrales innecesarios, ocultando las estrellas." },
+            { p: "¿Qué luz atrae menos insectos?", ops: ["UV (Ultravioleta)", "Azul intensa", "Cálida/Amarilla (Sodio)", "Blanca fría"], c: 2, exp: "Los insectos son muy sensibles al UV y al azul. Las luces amarillas/ámbar (espectro cálido) son menos visibles para ellos." },
+            { p: "Para leer en un escritorio se recomiendan aprox...", ops: ["50 Lux", "100 Lux", "500 Lux", "5000 Lux"], c: 2, exp: "Según normativas ergonómicas, 500 Lux es el estándar para tareas de lectura y escritura en oficinas." },
+            { p: "¿Un dimmer sirve para...?", ops: ["Cambiar el color.", "Regular la intensidad luminosa.", "Encender más rápido.", "Medir el consumo."], c: 1, exp: "Un dimmer o atenuador recorta la onda eléctrica para variar la cantidad de luz que emite la lámpara." },
+            { p: "¿Qué es el flujo luminoso útil?", ops: ["Todo lo que sale de la lámpara.", "El que realmente llega a donde queremos iluminar.", "El que se pierde.", "El calor generado."], c: 1, exp: "En focos direccionales, es el flujo que cae dentro de un cono (ej 90°), descartando la luz que se desperdicia hacia los lados." },
+            { p: "El ángulo de apertura indica...", ops: ["La temperatura.", "Cuán concentrado o abierto es el haz de luz.", "La inclinación de la lámpara.", "El voltaje."], c: 1, exp: "También llamado 'Beam Angle', define qué tan ancho es el cono de luz. Un ángulo bajo (10°) es un punto focal; alto (120°) es luz general." },
+            { p: "¿Qué luz tiene mayor componente azul?", ops: ["Luz de vela.", "Incandescente.", "Luz fría (6500K).", "Sodio baja presión."], c: 2, exp: "Las temperaturas de color altas (frías) tienen un espectro con pico en el azul, similar a la luz del cielo diurno." },
+            { p: "¿La luz se comporta como...?", ops: ["Solo partícula.", "Solo onda.", "Onda y partícula (dualidad).", "Fluido."], c: 2, exp: "La luz tiene dualidad onda-corpúsculo: se propaga como onda electromagnética pero interactúa con la materia como paquetes de energía (fotones)." },
+            { p: "El RGB se compone de...", ops: ["Rojo, Amarillo, Azul", "Rojo, Verde, Azul", "Cian, Magenta, Amarillo", "Blanco, Negro, Gris"], c: 1, exp: "RGB (Red, Green, Blue) es el sistema de mezcla aditiva de luz. Sumando los tres se obtiene blanco." }
+        ]
+    };
+
+    /* ================= LÓGICA DEL SISTEMA ================= */
+    let preguntasExamen = [];
+
+    function mezclar(array) {
+        let copia = [...array];
+        for (let i = copia.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [copia[i], copia[j]] = [copia[j], copia[i]];
+        }
+        return copia;
+    }
+
+    function iniciarExamen(tema) {
+        document.getElementById('seccion-menu').style.display = 'none';
+        document.getElementById('seccion-quiz').style.display = 'block';
+        document.getElementById('resultado-final').style.display = 'none';
+        
+        // Botones
+        document.getElementById('btn-eval').style.display = 'inline-block';
+        document.getElementById('btn-pdf').style.display = 'none';
+        
+        // Tema y Título
+        const numTema = Math.floor(Math.random() * 3) + 1;
+        document.getElementById('badge-tema').innerText = `TEMA ${numTema}`;
+        document.getElementById('badge-tema').style.backgroundColor = tema === 'acustica' ? '#3498db' : '#e67e22';
+        
+        const titulos = { acustica: "Práctica de Acústica", luminotecnia: "Práctica de Luminotecnia" };
+        document.getElementById('titulo-tema').innerText = titulos[tema];
+
+        // Selección de preguntas
+        const todasLasPreguntas = mezclar(bancoPreguntas[tema]);
+        preguntasExamen = todasLasPreguntas.slice(0, 10);
+
+        // Renderizado
+        const contenedor = document.getElementById('quiz-container');
+        contenedor.innerHTML = "";
+
+        preguntasExamen.forEach((item, index) => {
+            let bloque = document.createElement('div');
+            bloque.className = "question-block";
+            
+            let titulo = document.createElement('span');
+            titulo.className = "question-title";
+            titulo.innerText = `${index + 1}. ${item.p}`;
+            bloque.appendChild(titulo);
+
+            let divOpciones = document.createElement('div');
+            divOpciones.className = "options";
+
+            item.ops.forEach((opcion, i) => {
+                let label = document.createElement('label');
+                label.innerHTML = `<input type="radio" name="p${index}" value="${i}"> ${opcion}`;
+                divOpciones.appendChild(label);
+            });
+            bloque.appendChild(divOpciones);
+
+            // Div de Explicación (Oculto al principio)
+            let feedback = document.createElement('div');
+            feedback.id = `feedback-${index}`;
+            feedback.className = "feedback";
+            bloque.appendChild(feedback);
+
+            contenedor.appendChild(bloque);
+        });
+        window.scrollTo(0, 0);
+    }
+
+    function verificarRespuestas() {
+        let puntaje = 0;
+        let total = preguntasExamen.length;
+
+        preguntasExamen.forEach((item, index) => {
+            const opciones = document.getElementsByName(`p${index}`);
+            const feedbackDiv = document.getElementById(`feedback-${index}`);
+            let seleccionado = null;
+
+            for (let radio of opciones) {
+                if (radio.checked) seleccionado = parseInt(radio.value);
+                radio.disabled = true;
+            }
+
+            // Generar HTML de la explicación
+            let htmlFeedback = "";
+            
+            if (seleccionado === item.c) {
+                puntaje++;
+                feedbackDiv.className = "feedback correct";
+                htmlFeedback += `<p><strong>✅ ¡Correcto!</strong></p>`;
+            } else {
+                feedbackDiv.className = "feedback incorrect";
+                let respDada = seleccionado !== null ? item.ops[seleccionado] : "Ninguna";
+                let respCorrecta = item.ops[item.c];
+                htmlFeedback += `<p class="incorrect-label">❌ Incorrecto</p>`;
+                htmlFeedback += `<p>Respuesta correcta: <strong>${respCorrecta}</strong></p>`;
+            }
+            
+            // AGREGAR LA EXPLICACIÓN TÉCNICA SIEMPRE (Didáctico)
+            htmlFeedback += `<hr style="border: 0; border-top: 1px solid rgba(0,0,0,0.1); margin: 10px 0;">`;
+            htmlFeedback += `<span class="explanation-title">Justificación:</span>`;
+            htmlFeedback += `<span>${item.exp}</span>`;
+
+            feedbackDiv.innerHTML = htmlFeedback;
+            feedbackDiv.style.display = "block";
+        });
+
+        // Nota Final
+        const divFinal = document.getElementById('resultado-final');
+        let porcentaje = Math.round((puntaje / total) * 100);
+        
+        divFinal.innerText = `Calificación Final: ${puntaje} / ${total} (${porcentaje}%)`;
+        
+        if(puntaje >= 6) {
+            divFinal.style.backgroundColor = "#d4edda";
+            divFinal.style.color = "#155724";
+            divFinal.style.borderColor = "#c3e6cb";
+        } else {
+            divFinal.style.backgroundColor = "#fff3cd"; // Amarillo suave para no ser tan agresivo
+            divFinal.style.color = "#856404";
+            divFinal.style.borderColor = "#ffeeba";
+        }
+        divFinal.style.display = "block";
+
+        document.getElementById('btn-eval').style.display = 'none';
+        document.getElementById('btn-pdf').style.display = 'inline-block';
+        
+        divFinal.scrollIntoView({ behavior: 'smooth' });
+    }
+
+    function volverAlMenu() {
+        if(confirm("¿Salir al menú principal? Se perderá el examen actual.")) {
+            document.getElementById('seccion-quiz').style.display = 'none';
+            document.getElementById('seccion-menu').style.display = 'block';
+        }
+    }
+</script>
+
+</body>
+</html>
