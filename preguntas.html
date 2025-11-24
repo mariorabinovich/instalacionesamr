@@ -7,25 +7,32 @@
     <style>
         /* ================= ESTILOS GENERALES ================= */
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f4f6f9; margin: 0; padding: 20px; color: #333; }
-        .container { max-width: 850px; margin: 0 auto; background: white; padding: 40px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+        .container { max-width: 900px; margin: 0 auto; background: white; padding: 40px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
         
         /* Encabezados */
-        h1 { text-align: center; color: #2c3e50; margin-bottom: 5px; text-transform: uppercase; letter-spacing: 1px; }
+        h1 { text-align: center; color: #2c3e50; margin-bottom: 5px; text-transform: uppercase; letter-spacing: 2px; }
         .subtitle { text-align: center; color: #7f8c8d; margin-bottom: 30px; font-weight: 300; }
         .exam-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #3498db; padding-bottom: 15px; margin-bottom: 20px; }
         .tema-badge { background-color: #3498db; color: white; padding: 5px 15px; border-radius: 20px; font-weight: bold; font-size: 0.9em; }
 
         /* Menú Principal */
-        .menu-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; }
+        .menu-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; }
         .menu-btn { 
-            padding: 30px; font-size: 1.3rem; color: white; border: none; border-radius: 10px; cursor: pointer; 
-            transition: transform 0.2s, box-shadow 0.2s; box-shadow: 0 4px 6px rgba(0,0,0,0.1); font-weight: bold;
+            padding: 25px 20px; font-size: 1.1rem; color: white; border: none; border-radius: 10px; cursor: pointer; 
+            transition: transform 0.2s, box-shadow 0.2s; box-shadow: 0 4px 8px rgba(0,0,0,0.1); font-weight: bold;
+            text-align: left;
         }
+        .menu-btn:hover { transform: translateY(-3px); box-shadow: 0 8px 15px rgba(0,0,0,0.2); }
+
+        /* Colores Específicos */
         .btn-acustica { background: linear-gradient(135deg, #3498db, #2980b9); }
         .btn-lumi { background: linear-gradient(135deg, #f1c40f, #e67e22); }
-        .menu-btn:hover { transform: translateY(-3px); box-shadow: 0 6px 12px rgba(0,0,0,0.15); }
+        .btn-agua { background: linear-gradient(135deg, #2ecc71, #27ae60); }
+        .btn-incendios { background: linear-gradient(135deg, #e74c3c, #c0392b); }
+        .btn-ac { background: linear-gradient(135deg, #9b59b6, #8e44ad); }
+        .btn-termica { background: linear-gradient(135deg, #34495e, #2c3e50); }
 
-        /* Preguntas */
+        /* Preguntas y Opciones */
         #seccion-quiz { display: none; }
         .question-block { margin-bottom: 20px; padding: 20px; border: 1px solid #e1e4e8; border-radius: 8px; background-color: #fff; page-break-inside: avoid; }
         .question-title { font-weight: bold; font-size: 1.1em; margin-bottom: 12px; display: block; color: #2c3e50; }
@@ -34,20 +41,19 @@
         .options label:hover { background-color: #f8f9fa; border-color: #dee2e6; }
         input[type="radio"] { margin-right: 12px; }
 
-        /* Botones */
+        /* Botones de Acción */
         .btn-container { margin-top: 30px; display: flex; gap: 10px; flex-wrap: wrap; }
         .action-btn { flex: 1; padding: 15px; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 1rem; color: white; transition: background 0.3s; }
         .btn-evaluar { background-color: #27ae60; } .btn-evaluar:hover { background-color: #219150; }
         .btn-volver { background-color: #7f8c8d; } .btn-volver:hover { background-color: #6c757d; }
-        .btn-pdf { background-color: #e74c3c; display: none; } .btn-pdf:hover { background-color: #c0392b; }
+        .btn-pdf { background-color: #34495e; display: none; } .btn-pdf:hover { background-color: #2c3e50; }
 
         /* Feedback (Explicaciones) */
         .feedback { margin-top: 15px; padding: 15px; border-radius: 6px; font-size: 0.95em; display: none; border-left: 5px solid transparent; }
         .feedback p { margin: 0 0 5px 0; }
-        .correct { background-color: #d4edda; color: #155724; border-left-color: #28a745; }
-        .incorrect { background-color: #fff3cd; color: #856404; border-left-color: #ffc107; } /* Amarillo alerta para explicación */
+        .correct { background-color: #f0fff4; color: #155724; border-left-color: #28a745; border: 1px solid #c3e6cb; }
+        .incorrect { background-color: #fff3cd; color: #856404; border-left-color: #ffc107; border: 1px solid #ffeeba; } 
         .incorrect-label { color: #dc3545; font-weight: bold; }
-        
         .explanation-title { font-weight: bold; display: block; margin-bottom: 5px; text-decoration: underline; }
 
         /* Resultado Final */
@@ -55,18 +61,18 @@
 
         /* ================= IMPRESIÓN (PDF) ================= */
         @media print {
-            body { background-color: white; padding: 0; font-size: 12pt; }
+            body { background-color: white; padding: 0; font-size: 11pt; }
             .container { box-shadow: none; max-width: 100%; padding: 0; margin: 0; }
             #seccion-menu, .btn-container, .subtitle { display: none !important; }
             #seccion-quiz { display: block !important; }
-            h1 { font-size: 18pt; margin-bottom: 10px; }
+            h1 { font-size: 16pt; margin-bottom: 10px; }
             
             /* Colores forzados */
-            .correct { -webkit-print-color-adjust: exact; print-color-adjust: exact; background-color: #f0fff4 !important; border: 1px solid #ccc; }
-            .incorrect { -webkit-print-color-adjust: exact; print-color-adjust: exact; background-color: #fffbf0 !important; border: 1px solid #ccc; }
+            .correct { -webkit-print-color-adjust: exact; print-color-adjust: exact; background-color: #f0fff4 !important; color: #155724 !important; border: 1px solid #ccc; }
+            .incorrect { -webkit-print-color-adjust: exact; print-color-adjust: exact; background-color: #fffbf0 !important; color: #856404 !important; border: 1px solid #ccc; }
             #resultado-final { -webkit-print-color-adjust: exact; print-color-adjust: exact; display: block !important; border: 2px solid #000; }
             
-            .question-block { border: none; border-bottom: 1px solid #eee; margin-bottom: 15px; padding: 10px 0; }
+            .question-block { border: none; border-bottom: 1px solid #eee; margin-bottom: 10px; padding: 10px 0; }
         }
     </style>
 </head>
@@ -76,18 +82,30 @@
     
     <div id="seccion-menu">
         <h1>Práctica</h1>
-        <p class="subtitle">Seleccione el módulo técnico a evaluar</p>
+        <p class="subtitle">Seleccione el módulo técnico a evaluar (10 preguntas aleatorias por intento)</p>
         
         <div class="menu-grid">
             <button class="menu-btn btn-acustica" onclick="iniciarExamen('acustica')">
-                🔊 Acústica
+                🔊 1. Acústica
             </button>
             <button class="menu-btn btn-lumi" onclick="iniciarExamen('luminotecnia')">
-                💡 Luminotecnia
+                💡 2. Luminotecnia
+            </button>
+            <button class="menu-btn btn-agua" onclick="iniciarExamen('calefaccion_agua')">
+                🔥 3. Calefacción por Agua
+            </button>
+            <button class="menu-btn btn-incendios" onclick="iniciarExamen('incendios')">
+                🚨 4. Incendios
+            </button>
+            <button class="menu-btn btn-ac" onclick="iniciarExamen('aire_acondicionado')">
+                ❄️ 5. Aire Acondicionado
+            </button>
+            <button class="menu-btn btn-termica" onclick="iniciarExamen('transmitancia')">
+                🌡️ 6. Transmitancia y Balance Térmico
             </button>
         </div>
         <p style="text-align: center; margin-top: 40px; color: #999; font-size: 0.9em;">
-            El sistema generará un examen aleatorio con 10 preguntas y sus respectivas justificaciones técnicas.
+            Cada intento selecciona 10 preguntas al azar de un banco de 30, asegurando la variabilidad.
         </p>
     </div>
 
@@ -114,9 +132,10 @@
 
 <script>
     /* =========================================================
-       BASE DE DATOS CON EXPLICACIONES (exp)
+       BASE DE DATOS COMPLETA (6 Temas x 30 Preguntas = 180 Preguntas)
        ========================================================= */
     const bancoPreguntas = {
+        // TEMA 1: ACÚSTICA (EXISTENTE)
         acustica: [
             { p: "¿Cuál es la definición física del sonido?", ops: ["Onda electromagnética.", "Onda mecánica longitudinal.", "Flujo de partículas.", "Onda transversal."], c: 1, exp: "El sonido es una perturbación mecánica que necesita un medio material (aire, agua, sólido) para propagarse. Es longitudinal porque las partículas vibran en la misma dirección que la onda." },
             { p: "¿Qué cualidad subjetiva determina la frecuencia?", ops: ["Timbre", "Intensidad", "Altura o Tono", "Duración"], c: 2, exp: "La frecuencia física (Hz) se percibe subjetivamente como la Altura o Tono. A mayor frecuencia, sonido más agudo; a menor frecuencia, más grave." },
@@ -125,14 +144,14 @@
             { p: "¿Dónde viaja más rápido el sonido?", ops: ["Aire", "Agua", "Acero", "Vacío"], c: 2, exp: "El sonido viaja más rápido en medios más densos y elásticos. En el acero (~5000 m/s) viaja mucho más rápido que en agua (~1500 m/s) o aire (~340 m/s)." },
             { p: "¿Unidad del Nivel de Presión Sonora?", ops: ["Hz", "Watts", "Pascales", "Decibeles (dB)"], c: 3, exp: "El Decibel (dB) es la unidad logarítmica usada para medir el nivel de presión sonora, comparando la presión medida con una presión de referencia auditiva." },
             { p: "¿Qué es la Resonancia?", ops: ["Vibración por coincidencia de frecuencia natural.", "Anulación de ondas.", "Reflexión del sonido.", "Cambio de tono por movimiento."], c: 0, exp: "La resonancia ocurre cuando una fuerza externa impulsa a un sistema a oscilar a su frecuencia natural, aumentando drásticamente la amplitud." },
-            { p: "¿Diferencia clave entre Eco y Reverberación?", ops: ["El tipo de superficie.", "La frecuencia.", "El tiempo de retardo (>0.1s).", "No hay diferencia."], c: 2, exp: "Físicamente es el mismo fenómeno (reflexión), pero si el retardo es mayor a ~0.1s (aprox 17m), el oído distingue dos sonidos separados (Eco). Si es menor, se suman (Reverberación)." },
+            { p: "¿Diferencia clave entre Eco y Reverberación?", ops: ["El tipo de superficie.", "La frecuencia.", "El tiempo de retardo (>0.1s es Eco).", "No hay diferencia."], c: 2, exp: "Físicamente es el mismo fenómeno (reflexión), pero si el retardo es mayor a ~0.1s (aprox 17m), el oído distingue dos sonidos separados (Eco). Si es menor, se suman (Reverberación)." },
             { p: "¿Qué distingue la misma nota en distintos instrumentos?", ops: ["Frecuencia", "Intensidad", "Longitud de onda", "Timbre"], c: 3, exp: "El timbre depende de la composición de armónicos de la onda. Aunque la frecuencia fundamental sea la misma (la misma nota), los armónicos hacen que suenen distinto." },
             { p: "¿Efecto Doppler al acercarse la fuente?", ops: ["Sonido más grave", "Sonido más agudo", "Menos volumen", "Mayor velocidad"], c: 1, exp: "Al acercarse la fuente, las ondas se 'comprimen' frente a ella, llegando con mayor frecuencia al observador, percibiéndose más agudo." },
             { p: "¿Cuál es el umbral de dolor auditivo aproximado?", ops: ["60 dB", "90 dB", "120-140 dB", "200 dB"], c: 2, exp: "Alrededor de los 120-130 dB la sensación auditiva comienza a convertirse en dolor físico y daño inmediato." },
             { p: "¿Puede el sonido viajar en el vacío?", ops: ["Sí, a baja velocidad.", "No, necesita un medio material.", "Sí, si es alta frecuencia.", "Depende de la temperatura."], c: 1, exp: "El sonido es una onda mecánica, lo que significa que requiere vibración de materia (átomos/moléculas). En el vacío no hay nada que vibre." },
             { p: "¿Qué es un Infrasonido?", ops: ["Sonido muy fuerte.", "Frecuencia superior a 20.000 Hz.", "Frecuencia inferior a 20 Hz.", "Sonido dentro del agua."], c: 2, exp: "Los infrasonidos son frecuencias por debajo del umbral de audición humano (menos de 20 Hz), producidos por sismos, elefantes, etc." },
             { p: "¿Qué es un Ultrasonido?", ops: ["Frecuencia superior a 20.000 Hz.", "Frecuencia inferior a 20 Hz.", "Sonido digital.", "Ruido blanco."], c: 0, exp: "Frecuencias por encima del límite humano superior (20 kHz). Usados en ecografías y sonares." },
-            { p: "¿Qué material es mejor aislante acústico?", ops: ["Vidrio simple", "Hormigón armado", "Lana de roca/vidrio", "Metal"], c: 2, exp: "Los materiales porosos y fibrosos como la lana de vidrio atrapan el aire y disipan la energía sonora por fricción, siendo excelentes absorbentes/aislantes." },
+            { p: "¿Qué material es mejor aislante acústico?", ops: ["Vidrio simple", "Hormigón armado", "Lana de roca/vidrio (poroso)", "Metal"], c: 2, exp: "Los materiales porosos y fibrosos como la lana de vidrio atrapan el aire y disipan la energía sonora por fricción, siendo excelentes absorbentes/aislantes." },
             { p: "¿Cómo se llama el tiempo que tarda una onda en completar un ciclo?", ops: ["Frecuencia", "Periodo", "Amplitud", "Longitud"], c: 1, exp: "El Periodo (T) es el tiempo en segundos que dura un ciclo completo. Es el inverso de la frecuencia (T = 1/f)." },
             { p: "¿La velocidad del sonido en el aire depende principalmente de...?", ops: ["La frecuencia.", "La intensidad.", "La temperatura del aire.", "El volumen de la fuente."], c: 2, exp: "La velocidad varía con la temperatura: aumenta aprox. 0.6 m/s por cada grado Celsius que sube la temperatura." },
             { p: "¿Qué es la longitud de onda?", ops: ["La altura de la onda.", "Distancia entre dos crestas consecutivas.", "Número de ciclos por segundo.", "El tiempo de vibración."], c: 1, exp: "Es la distancia física que recorre la onda en un ciclo completo. Se representa con la letra griega lambda (λ)." },
@@ -149,6 +168,7 @@
             { p: "¿El sonido es una onda...?", ops: ["Bidimensional.", "Unidimensional.", "Tridimensional (esférica).", "Cuatridimensional."], c: 2, exp: "En un medio abierto, el sonido se propaga en todas las direcciones del espacio, formando frentes de onda esféricos (3D)." },
             { p: "¿Qué instrumento mide el nivel sonoro?", ops: ["Luxómetro", "Sonómetro", "Multímetro", "Barómetro"], c: 1, exp: "El sonómetro es el instrumento diseñado para medir niveles de presión sonora de forma objetiva, generalmente en decibeles." }
         ],
+        // TEMA 2: LUMINOTECNIA (EXISTENTE)
         luminotecnia: [
             { p: "Unidad del Flujo Luminoso", ops: ["Lux", "Candela", "Lumen", "Watt"], c: 2, exp: "El Lumen (lm) mide la cantidad total de luz visible emitida por una fuente. Lux es para luz recibida, Candela para intensidad en una dirección." },
             { p: "¿Qué medimos en Lux?", ops: ["Iluminancia (luz que llega).", "Luminancia (brillo).", "Flujo total.", "Potencia."], c: 0, exp: "El Lux mide la Iluminancia: cuántos lúmenes caen sobre un metro cuadrado de superficie." },
@@ -180,6 +200,142 @@
             { p: "¿Qué luz tiene mayor componente azul?", ops: ["Luz de vela.", "Incandescente.", "Luz fría (6500K).", "Sodio baja presión."], c: 2, exp: "Las temperaturas de color altas (frías) tienen un espectro con pico en el azul, similar a la luz del cielo diurno." },
             { p: "¿La luz se comporta como...?", ops: ["Solo partícula.", "Solo onda.", "Onda y partícula (dualidad).", "Fluido."], c: 2, exp: "La luz tiene dualidad onda-corpúsculo: se propaga como onda electromagnética pero interactúa con la materia como paquetes de energía (fotones)." },
             { p: "El RGB se compone de...", ops: ["Rojo, Amarillo, Azul", "Rojo, Verde, Azul", "Cian, Magenta, Amarillo", "Blanco, Negro, Gris"], c: 1, exp: "RGB (Red, Green, Blue) es el sistema de mezcla aditiva de luz. Sumando los tres se obtiene blanco." }
+        ],
+        
+        // TEMA 3: CALEFACCIÓN POR AGUA (NUEVO)
+        calefaccion_agua: [
+            { p: "¿Cuál es el principal fluido de trabajo en un sistema de calefacción por agua?", ops: ["Agua destilada.", "Agua con anticongelante.", "Agua desmineralizada.", "Agua."], c: 3, exp: "El agua es el medio más eficiente para transportar grandes cantidades de energía térmica a baja temperatura. Se le puede añadir anticongelante si hay riesgo de heladas, pero el medio principal es el agua." },
+            { p: "¿Cómo se denomina en Argentina al coeficiente de transmitancia térmica ($U$ en el SI)?", ops: ["Coeficiente $\\lambda$.", "Coeficiente $\\rho$.", "Coeficiente $R$.", "Coeficiente $K$."], c: 3, exp: "En Argentina y otros países se utiliza históricamente la letra $K$ para referirse a la Transmitancia Térmica ($W/m^2K$). $U$ es la designación internacional. $\\lambda$ es la Conductividad." },
+            { p: "¿Cuál es la diferencia principal entre piso radiante y losa radiante?", ops: ["Son sinónimos.", "Piso radiante se usa para frío y losa para calor.", "La losa radiante implica que el sistema está embebido en la estructura de hormigón.", "El piso radiante es solo para planta baja."], c: 2, exp: "Ambos términos se refieren a la calefacción por suelo. Técnicamente, la 'losa radiante' implica la integración en la losa estructural, lo que implica mayor inercia térmica, mientras que el 'piso radiante' puede ser un sistema más delgado sobre el contrapiso." },
+            { p: "¿Cuál es la temperatura típica de impulsión de agua en un sistema de radiadores?", ops: ["$30^{\\circ}C$ a $45^{\\circ}C$.", "$40^{\\circ}C$ a $50^{\\circ}C$.", "$60^{\\circ}C$ a $80^{\\circ}C$.", "$85^{\\circ}C$ a $95^{\\circ}C$."], c: 2, exp: "Los radiadores requieren una temperatura más alta ($60^{\\circ}C$ a $80^{\\circ}C$) para calentar el ambiente rápidamente por convección, a diferencia del piso radiante que usa baja temperatura." },
+            { p: "¿Cuál es la temperatura superficial máxima permitida en un piso radiante para confort humano?", ops: ["$25^{\\circ}C$ a $29^{\\circ}C$.", "$30^{\\circ}C$ a $35^{\\circ}C$.", "$35^{\\circ}C$ a $40^{\\circ}C$.", "$22^{\\circ}C$ a $24^{\\circ}C$."], c: 0, exp: "Una temperatura superficial superior a $29^{\\circ}C$ puede causar incomodidad, hinchazón o problemas circulatorios en los pies. El límite de diseño es típicamente $29^{\\circ}C$." },
+            { p: "¿Qué componente controla la temperatura de ida del agua a los circuitos de un piso radiante?", ops: ["Bomba circuladora.", "Termostato de ambiente.", "Válvula de seguridad.", "Válvula mezcladora termostática."], c: 3, exp: "La válvula mezcladora termostática combina el agua caliente de la caldera con el retorno frío para mantener la baja temperatura requerida por el piso radiante, protegiendo el sistema y el usuario." },
+            { p: "¿Qué tipo de transferencia de calor es predominante en un sistema de radiadores?", ops: ["Conducción.", "Convección.", "Radiación.", "Ebullición."], c: 1, exp: "Los radiadores calientan el aire circundante (convección) y emiten algo de calor por radiación, siendo la convección el mecanismo dominante para distribuir el calor en el ambiente." },
+            { p: "¿Cuál es la función del vaso de expansión en la caldera?", ops: ["Recoger el aire.", "Mantener la temperatura del agua.", "Absorber el aumento de volumen del agua caliente.", "Regular la presión del gas."], c: 2, exp: "El vaso de expansión absorbe el aumento de volumen del agua al calentarse, manteniendo la presión dentro de límites seguros en el circuito cerrado." },
+            { p: "En un sistema de piso radiante, ¿por qué es fundamental aislar térmicamente hacia abajo (contrapiso)?", ops: ["Para evitar el ruido.", "Para evitar la pérdida de calor al terreno o nivel inferior.", "Para mantener la humedad del hormigón.", "Para acelerar la inercia térmica."], c: 1, exp: "El aislamiento bajo la losa evita que el calor se pierda en el terreno o en el nivel inferior, forzándolo a ir hacia el ambiente superior, mejorando la eficiencia." },
+            { p: "¿Qué se instala en los circuitos de piso radiante para purgar el aire al inicio del sistema?", ops: ["Llaves de purga en el colector (manifold).", "Válvulas de esfera.", "Purgadores automáticos en cada circuito.", "Válvulas de retención."], c: 0, exp: "El colector (manifold) tiene las llaves de purga y llenado para asegurar que el agua circule sin burbujas de aire que impidan el flujo." },
+            { p: "¿Qué diferencia de funcionamiento hay entre un sistema monotubo y uno bitubo de radiadores?", ops: ["Monotubo es más eficiente.", "Bitubo requiere mayor temperatura de impulsión.", "Bitubo utiliza tuberías separadas para ida y retorno, asegurando temperatura uniforme.", "Monotubo es solo para grandes instalaciones."], c: 2, exp: "El sistema bitubo asegura que todos los radiadores reciban agua a una temperatura similar. En el monotubo, el agua se enfría progresivamente a medida que pasa por cada radiador." },
+            { p: "¿Cuál es la mejor ubicación para instalar un radiador en una habitación?", ops: ["En un muro interior.", "Bajo la ventana.", "Cerca de la puerta de entrada.", "En la esquina más fría."], c: 1, exp: "Bajo las ventanas, ya que compensa la mayor pérdida de calor de la carpintería y crea una cortina convectiva que bloquea el aire frío descendente." },
+            { p: "¿Qué elemento se utiliza para equilibrar el caudal en cada circuito de un piso radiante?", ops: ["Válvula de zona.", "Termostato de ambiente.", "Válvula de seguridad.", "Caudalímetros o válvulas de equilibrado."], c: 3, exp: "Los caudalímetros o válvulas de equilibrado en el colector permiten ajustar el flujo para asegurar que todos los circuitos entreguen la misma cantidad de calor, evitando zonas frías." },
+            { p: "En una caldera mural, ¿qué indica la sigla 'tiro natural'?", ops: ["Que toma el aire del ambiente donde está instalada.", "Que utiliza un ventilador para la evacuación de humos.", "Que solo sirve para agua caliente sanitaria.", "Que no requiere ventilación."], c: 0, exp: "El tiro natural utiliza la flotabilidad de los gases calientes (chimenea) y toma el aire de combustión del local, requiriendo ventilación reglamentaria." },
+            { p: "¿Qué es la 'inercia térmica' en el piso radiante?", ops: ["La rapidez con la que enciende la caldera.", "La cantidad de agua que circula.", "La lentitud del sistema para calentarse y enfriarse.", "La capacidad de mantener el calor sin usar la caldera."], c: 2, exp: "Es la lentitud del sistema para calentarse y enfriarse, debido a la gran masa de cemento y hormigón que debe acumular o liberar calor, lo que implica un manejo anticipado del termostato." },
+            { p: "¿Qué presión aproximada debe tener un circuito hidráulico cerrado de calefacción?", ops: ["$0.5$ bar.", "$1.5$ a $2.0$ bar.", "$5$ a $10$ bar.", "$3.0$ a $4.0$ bar."], c: 1, exp: "La mayoría de los sistemas cerrados (domésticos) operan entre $1.5$ y $2.0$ bar de presión en frío, para asegurar la presión suficiente en los puntos más altos." },
+            { p: "¿Cuál es el principal método de control de temperatura ambiente en un sistema de radiadores moderno?", ops: ["Termostatos individuales (válvulas termostáticas) en cada radiador.", "Termostato de ambiente central único.", "Regulación de la temperatura de la caldera.", "Apagado y encendido manual."], c: 0, exp: "Los termostatos individuales permiten ajustar la temperatura en cada habitación independientemente, mejorando el confort y la eficiencia al evitar calentar zonas desocupadas." },
+            { p: "¿Por qué el piso radiante es más eficiente con bajas temperaturas de impulsión?", ops: ["Para evitar la deformación del piso.", "Para no secar el aire ambiente.", "Para reducir las pérdidas de calor.", "Permite a las calderas de condensación trabajar a su máxima eficiencia."], c: 3, exp: "Las bajas temperaturas (por debajo de $50^{\\circ}C$) permiten a las calderas de condensación trabajar en su rango más eficiente, aprovechando el calor latente de la condensación." },
+            { p: "¿Qué función cumple una bomba circuladora en el circuito?", ops: ["Calentar el agua.", "Forzar el movimiento del agua.", "Medir el caudal.", "Reducir la presión."], c: 1, exp: "La bomba fuerza el movimiento del agua desde la caldera a los emisores y viceversa, superando la fricción y las pérdidas de carga del sistema." },
+            { p: "¿Qué riesgo existe si se utiliza agua de red directamente sin tratar en un circuito cerrado?", ops: ["Baja presión del sistema.", "Incrustaciones de sarro (cal) y corrosión.", "Pérdida de calor por tuberías.", "Ruptura del vaso de expansión."], c: 1, exp: "La dureza del agua provoca incrustaciones de sarro (cal) en la caldera y los intercambiadores, disminuyendo la eficiencia y dañando el equipo." },
+            { p: "¿De qué material se fabrican típicamente los tubos del circuito de piso radiante hoy en día?", ops: ["Acero galvanizado.", "Cobre rígido.", "Polietileno reticulado (PEX) o Multicapa.", "PVC."], c: 2, exp: "El polietileno reticulado (PEX) o los tubos multicapa son los materiales estándar por su flexibilidad, resistencia a la temperatura, baja pérdida de carga y durabilidad." },
+            { p: "¿Qué es una válvula de zona?", ops: ["Una válvula motorizada para controlar el flujo a un sector.", "Una válvula que regula la presión.", "Una válvula de seguridad.", "Una válvula que purga el aire."], c: 0, exp: "Es una válvula motorizada que abre o cierra el flujo de agua a una sección o 'zona' específica de la casa, permitiendo el control independiente por termostato." },
+            { p: "¿Qué es una caldera de 'condensación'?", ops: ["Una caldera que solo calienta agua sanitaria.", "Una caldera que aprovecha el calor de los gases de escape.", "Una caldera de alto consumo.", "Una caldera que trabaja a muy alta presión."], c: 1, exp: "Aprovecha el calor latente liberado al condensar el vapor de agua de los gases de escape, logrando eficiencias muy altas, especialmente con sistemas de baja temperatura." },
+            { p: "¿Qué se entiende por 'calefacción por radiación' en el piso radiante?", ops: ["El calor se transfiere directamente de la superficie a los cuerpos sin calentar mucho el aire.", "El aire caliente que sube por convección.", "El calor que se pierde por la ventana.", "El calor que genera la caldera."], c: 0, exp: "El calor se transfiere directamente de la superficie caliente a los cuerpos y objetos fríos por ondas electromagnéticas (radiación), sin necesidad de calentar excesivamente el aire." },
+            { p: "¿Por qué un sistema de radiadores requiere menos tiempo para calentar un ambiente que un piso radiante?", ops: ["Tienen mayor caudal de agua.", "La caldera es más grande.", "Tienen menor inercia térmica.", "Trabajan con agua destilada."], c: 2, exp: "Al tener menor masa y mayor temperatura de trabajo, calientan el aire y el ambiente mucho más rápido (menor inercia) que la gran masa de la losa radiante." },
+            { p: "¿Qué componente se utiliza para evitar que la presión suba peligrosamente en la caldera?", ops: ["Válvula de seguridad.", "Vaso de expansión.", "Purgador automático.", "Bomba circuladora."], c: 0, exp: "La válvula de seguridad se abre automáticamente al superar un límite de presión (generalmente 3 bar) para liberar el exceso de agua y proteger el equipo." },
+            { p: "¿Qué tipo de bomba es la más utilizada en sistemas de calefacción domésticos modernos?", ops: ["De velocidad fija.", "De velocidad variable (electrónica).", "Bombas centrífugas.", "Bombas manuales."], c: 1, exp: "Las bombas de velocidad variable o circuladores electrónicos ajustan su caudal según la demanda del sistema y la apertura de válvulas, ahorrando energía." },
+            { p: "¿Para qué sirve un termostato limitador en el piso radiante?", ops: ["Para apagar la caldera.", "Para medir la temperatura de la superficie.", "Para asegurar que el agua de impulsión nunca supere una temperatura máxima de seguridad.", "Para controlar el ambiente."], c: 2, exp: "Asegura que el agua de impulsión a la losa nunca supere la temperatura de diseño (ej. $50^{\\circ}C$) para proteger los materiales del piso y evitar riesgos de quemaduras/incomodidad." },
+            { p: "¿Qué es un 'purgador automático' en un radiador?", ops: ["Un elemento para llenarlo.", "Una llave de drenaje.", "Un elemento para medir el caudal.", "Un dispositivo para liberar automáticamente el aire atrapado."], c: 3, exp: "Dispositivo que se instala en la parte superior del radiador para liberar automáticamente pequeñas burbujas de aire atrapadas durante el funcionamiento, sin necesidad de intervención manual." },
+            { p: "¿Qué combustible es el más común para calderas murales en viviendas argentinas?", ops: ["Gas Natural (GN).", "Gas oil.", "Electricidad.", "Leña."], c: 0, exp: "El Gas Natural (GN) es el combustible más utilizado y económico para sistemas de calefacción centralizados en la mayor parte del país, donde hay red de distribución." }
+        ],
+        
+        // TEMA 4: INCENDIOS (NUEVO)
+        incendios: [
+            { p: "¿Cuál es el principal objetivo de presurizar una caja de escaleras en altura (Según Código de Edificación CABA/Reglamento Técnico)?", ops: ["Ventilar el edificio.", "Reducir la temperatura.", "Evitar el ingreso de humo.", "Facilitar la subida de bomberos."], c: 2, exp: "La presurización crea un diferencial de presión positivo respecto a los pisos, impidiendo que el humo entre al conducto de evacuación, manteniendo una vía segura de escape." },
+            { p: "Según la normativa de Incendios en Argentina, ¿qué factor define principalmente si un edificio requiere rociadores automáticos (sprinklers)?", ops: ["La antigüedad del edificio.", "El uso del suelo.", "La superficie total y la carga de fuego.", "El número de ascensores."], c: 2, exp: "El factor clave es la superficie total del local o edificio y la carga de fuego (uso), por ejemplo, depósitos o grandes áreas comerciales (superiores a ciertos límites normativos)." },
+            { p: "¿Qué agente extintor está diseñado para actuar sobre incendios de Clase C (equipos eléctricos energizados)?", ops: ["Agua a presión.", "Dióxido de Carbono (CO2) o PQS.", "Espuma.", "Manta ignífuga."], c: 1, exp: "El CO2 o Polvo Químico Seco (PQS) son agentes no conductores que pueden usarse con seguridad en incendios eléctricos, ya que no transmiten la electricidad al operador." },
+            { p: "¿Cuál es la diferencia entre un hidrante 'de pared' y uno 'de columna' (o boca de impulsión)?", ops: ["El de columna es para uso de los bomberos en la calle, el de pared para uso interno.", "El de columna es para uso interno.", "El de pared solo tiene agua.", "El de columna es de espuma."], c: 0, exp: "El hidrante de pared es para uso de los ocupantes o bomberos dentro del edificio. La 'boca de impulsión' o 'de columna' es una toma exterior para que los bomberos inyecten agua al sistema interno." },
+            { p: "¿Qué función tiene un detector de humo de tipo iónico?", ops: ["Reaccionar a partículas de humo muy pequeñas.", "Reaccionar a la radiación térmica.", "Reaccionar a partículas grandes de humo visible.", "Detectar la caída de tensión eléctrica."], c: 0, exp: "Los detectores iónicos responden mejor a las partículas de humo muy pequeñas (típicas de fuegos rápidos e invisibles), alterando una corriente ionizada dentro de la cámara de detección." },
+            { p: "¿A qué se denomina 'Carga de Fuego'?", ops: ["La temperatura máxima que alcanza un incendio.", "El área de fuego en metros cuadrados.", "La cantidad de calor que se liberaría por unidad de superficie.", "El peso de los materiales combustibles."], c: 2, exp: "Es la cantidad de calor que se liberaría por unidad de superficie del local si todo el material combustible se quemara por completo, medida en $MJ/m^2$." },
+            { p: "¿Cuándo es obligatorio tener un sistema de detección y alarma de incendios según la normativa?", ops: ["En edificios de gran altura, hoteles, hospitales y áreas de alta carga de fuego.", "Solo en edificios industriales.", "Solo en depósitos de más de $500 m^2$.", "Solo si lo exige la compañía de seguros."], c: 0, exp: "Es obligatorio en edificios de gran altura, hoteles, hospitales, y áreas con alta densidad de ocupación o carga de fuego elevada, según la reglamentación local (ej. Ley 962 de CABA)." },
+            { p: "¿Qué es un 'sistema húmedo' de rociadores?", ops: ["El que usa espuma extintora.", "El que usa CO2 como agente extintor.", "Un sistema donde las tuberías están llenas de agua permanentemente.", "Un sistema que se llena de agua solo cuando hay fuego."], c: 2, exp: "Es un sistema donde las tuberías están llenas de agua permanentemente presurizada, lista para ser descargada inmediatamente al activarse el rociador, típico en climas sin riesgo de heladas." },
+            { p: "¿Qué norma se utiliza como referencia técnica internacional para la instalación de rociadores (sprinklers)?", ops: ["IRAM 11601.", "ISO 14001.", "ASTM E119.", "NFPA 13."], c: 3, exp: "La norma NFPA 13 (National Fire Protection Association) es el estándar internacional más reconocido y utilizado para el diseño e instalación de sistemas de rociadores." },
+            { p: "¿Qué componente debe estar obligatoriamente en la base de la cañería de presurización de una escalera?", ops: ["Un ventilador o inyector de aire forzado.", "Un extintor.", "Una válvula de retención.", "Un detector de humo."], c: 0, exp: "El ventilador o inyector de aire forzado es el que mantiene el diferencial de presión positivo en la escalera, inyectando aire de forma controlada." },
+            { p: "Un extintor de Clase A es apto para incendios de...", ops: ["Líquidos inflamables (nafta, alcohol).", "Gases (propano, butano).", "Combustibles sólidos comunes (madera, papel).", "Equipos eléctricos energizados."], c: 2, exp: "La Clase A es para combustibles sólidos comunes como madera, papel o telas. Su agente extintor típico es agua presurizada o espuma." },
+            { p: "¿Qué es una 'válvula de diluvio' en un sistema de rociadores?", ops: ["Una válvula que cierra el suministro de agua.", "Una válvula que permite la descarga simultánea de todos los rociadores de una zona.", "Una válvula que regula la presión.", "Una válvula de prueba."], c: 1, exp: "Permite la descarga simultánea de agua a través de todos los rociadores de una zona, utilizado en áreas de alto riesgo donde el fuego se puede propagar muy rápidamente." },
+            { p: "¿Cuál es la principal ventaja de un detector de llama?", ops: ["Bajo costo de instalación.", "Larga vida útil.", "Respuesta muy rápida a la radiación (IR o UV).", "Fácil de limpiar."], c: 2, exp: "Responde muy rápidamente a la radiación infrarroja o ultravioleta emitida por la llama (fuego), antes de que se genere mucho humo o calor visible, útil en áreas abiertas." },
+            { p: "¿Qué se utiliza para sectorizar el riesgo de incendio en un edificio?", ops: ["Paredes, losas y puertas con resistencia al fuego (F).", "Extintores portátiles.", "Detectores de humo.", "Mangueras de hidrante."], c: 0, exp: "La sectorización busca limitar la propagación del fuego a un área definida por un tiempo específico (ej. F60, F90, F120) mediante barreras constructivas." },
+            { p: "¿Qué indica la sigla $\\text{IRAM 3517}$ parte II?", ops: ["Reglamento de ascensores.", "Reglamento de inspección y recarga de extintores.", "Requisitos de iluminación de emergencia.", "Normativa de cañerías de gas."], c: 1, exp: "Esta norma argentina establece los requisitos de inspección, mantenimiento y recarga de extintores portátiles en el país." },
+            { p: "¿Cuál es la altura mínima reglamentaria para colocar la manija de un extintor en Argentina?", ops: ["Máximo $1.00$ metro.", "Entre $1.50$ y $2.00$ metros.", "Máximo $1.50$ metros.", "No hay altura reglamentaria."], c: 2, exp: "La parte superior del extintor debe quedar a una altura máxima de $1.50$ metros del nivel del piso para asegurar un fácil acceso." },
+            { p: "¿Qué tipo de señalización es obligatoria para indicar una salida de emergencia?", ops: ["Solo señalización con flechas.", "Señalización común (pintura).", "Carteles retro-reflectantes.", "Señalización fotoluminiscente."], c: 3, exp: "Debe ser fotoluminiscente, visible en caso de corte de energía, indicando la ruta de escape y los equipos de seguridad." },
+            { p: "¿Qué componente garantiza que el sistema de rociadores tenga siempre presión suficiente antes de la emergencia?", ops: ["La bomba de drenaje.", "La bomba jockey o presurizadora.", "La bomba principal de incendio.", "El tanque de reserva."], c: 1, exp: "La bomba jockey (o presurizadora) mantiene la presión del agua en las tuberías para compensar pequeñas fugas antes de que se active la bomba principal, que es de mayor caudal." },
+            { p: "¿Cuál es el principal riesgo de usar agua en un incendio de grasa de cocina (Clase F)?", ops: ["Aumentar la llama.", "Explosión de vapor (expansión rápida).", "Corroer el recipiente.", "Apagar la llama lentamente."], c: 1, exp: "El agua se evapora violentamente al contacto con la grasa caliente, lanzando el aceite encendido fuera del recipiente (efecto bola de fuego), propagando el incendio." },
+            { p: "En un sistema de detección, ¿qué se entiende por 'bucle' o 'lazo'?", ops: ["El sonido de la alarma.", "El detector de humo.", "El circuito cableado que conecta los detectores a la central.", "La fuente de alimentación."], c: 2, exp: "Es el circuito cableado donde se conectan una serie de detectores y pulsadores a la central de incendio, permitiendo identificar la ubicación del evento." },
+            { p: "¿Qué es la 'altura de evacuación' según el Código de Edificación?", ops: ["Distancia desde el piso hasta el techo.", "Distancia desde el piso hasta el rociador.", "Distancia entre el nivel del piso y el nivel de la acera o vía pública segura.", "La altura máxima del edificio."], c: 2, exp: "Es la distancia entre el nivel del piso donde se origina el fuego y el nivel de la acera o la vía pública segura, determinando el riesgo y los requisitos de escape." },
+            { p: "¿Cuál es la función principal de la 'campana de extinción' en una cocina industrial?", ops: ["Capturar y eliminar el humo de cocción.", "Contar con un sistema automático de extinción para grasas (Clase F).", "Evitar el deslumbramiento.", "Iluminar la zona de trabajo."], c: 1, exp: "Las campanas y ductos de extracción deben contar con un sistema automático de extinción por agentes químicos húmedos o espumas para fuegos de grasa (Clase F), debido al alto riesgo." },
+            { p: "¿Qué requisito debe cumplir una puerta corta-fuego ($\text{RF}$) para ser efectiva?", ops: ["Debe tener una mirilla de vidrio.", "Debe tener un cierre automático o barra antipánico.", "Debe ser de madera maciza.", "Debe estar pintada de rojo."], c: 1, exp: "Debe tener un mecanismo de cierre automático, asegurando que se mantenga cerrada para cumplir con su función de sectorización y contener el fuego y el humo." },
+            { p: "¿Qué tipo de extintor es el más adecuado para fuegos de metales combustibles (Clase D)?", ops: ["Agua a presión.", "PQS multipropósito.", "Agentes especiales (polvo de grafito o sales fundentes).", "CO2."], c: 2, exp: "Los metales combustibles (Clase D) reaccionan violentamente con el agua y otros agentes comunes. Requieren agentes especiales que aíslan y sofocan el metal ardiendo." },
+            { p: "¿Qué indica el color rojo en la cañería de un sistema fijo contra incendios?", ops: ["Que es cañería de gas.", "Que la tubería es de cobre.", "Que la presión es baja.", "Que transporta fluidos para la lucha contra el fuego."], c: 3, exp: "El color rojo está reservado para cañerías que contienen o transportan fluidos para la lucha contra el fuego (agua presurizada, espuma, etc.), facilitando su identificación." },
+            { p: "¿Qué es un 'sistema seco' de rociadores?", ops: ["Un sistema donde las tuberías están llenas de aire a presión, usado en zonas de heladas.", "Un sistema donde el agua está presurizada.", "Un sistema con extintores de polvo seco.", "Un sistema que solo usa detectores de calor."], c: 0, exp: "Es un sistema donde las tuberías están llenas de aire (o nitrógeno) a presión, y el agua ingresa solo después de que el rociador se activa por fuego. Se usa donde hay riesgo de congelamiento del agua." },
+            { p: "¿En qué ubicación debe instalarse obligatoriamente la boca de impulsión para bomberos?", ops: ["Junto a la caldera.", "En la fachada del edificio, en un lugar de fácil acceso desde la vía pública.", "En el cuarto de bombas.", "En el techo."], c: 1, exp: "Debe estar en la fachada del edificio, en un lugar de fácil acceso desde la vía pública, para que los bomberos puedan inyectar agua al sistema interno del edificio." },
+            { p: "¿Cuál es la función de la 'válvula de alarma' en un sistema de rociadores?", ops: ["Regular el caudal.", "Desviar el flujo de agua.", "Es una válvula de retención que activa una alarma sonora hidráulica al detectar flujo.", "Cerrar el sistema."], c: 2, exp: "Es una válvula de retención que al detectar el flujo de agua hacia los rociadores (indicando una descarga), activa una alarma sonora hidráulica sin depender de la electricidad." },
+            { p: "¿Qué es un 'pulsador de alarma' en un sistema de detección?", ops: ["Un sensor de calor.", "Una sirena.", "Un botón para apagar la alarma.", "Un dispositivo de accionamiento manual para iniciar la alarma."], c: 3, exp: "Es un dispositivo de accionamiento manual (botón rojo) que permite a cualquier persona iniciar la alarma de evacuación al detectar un incendio." },
+            { p: "¿Qué significa que una escalera tenga un Factor de Resistencia al Fuego $\\text{F-60}$?", ops: ["Sus elementos estructurales resisten el fuego por $60$ minutos.", "Es para evacuar hasta $60$ personas.", "Está a $60$ metros de la salida.", "Tiene una pendiente de $60^{\\circ}$."], c: 0, exp: "Indica que sus elementos estructurales son capaces de resistir el fuego sin colapsar, evitando la propagación, por al menos $60$ minutos, manteniendo la vía de escape." }
+        ],
+
+        // TEMA 5: AIRE ACONDICIONADO (NUEVO)
+        aire_acondicionado: [
+            { p: "¿Qué proceso es la base de todo ciclo de refrigeración por compresión?", ops: ["Expansión del aire.", "Compresión del gas.", "Evaporación del refrigerante.", "Condensación del refrigerante."], c: 2, exp: "La evaporación del refrigerante dentro del evaporador (unidad interior) es el proceso que absorbe el calor del ambiente, enfriando el aire." },
+            { p: "¿Cuál es la unidad de potencia frigorífica más utilizada en Argentina, a nivel comercial?", ops: ["Frigoría.", "BTU/h.", "Watt (W).", "Tonelada de Refrigeración (TR)."], c: 0, exp: "El término Frigoría (1 frig/h = $1$ $kcal/h$) es el más utilizado comercialmente en Argentina y países latinos. La unidad técnica SI es el Watt/kW." },
+            { p: "¿Qué función tiene el compresor en el circuito frigorífico?", ops: ["Condensar el refrigerante.", "Elevar la presión y temperatura del refrigerante gaseoso.", "Evaporar el refrigerante.", "Deshumidificar el aire."], c: 1, exp: "El compresor eleva la presión y temperatura del refrigerante gaseoso, moviendo el ciclo y preparándolo para liberar calor en el condensador." },
+            { p: "¿Cómo se denomina el refrigerante de alto rendimiento más eficiente y común en los equipos Split modernos?", ops: ["R-22.", "R-134a.", "R-12.", "R-410A o R-32."], c: 3, exp: "El R-410A y su sucesor R-32 son refrigerantes HFC (hidrofluorocarbonos) utilizados por su alta eficiencia y bajo potencial de agotamiento del ozono, aunque R-32 tiene menor GWP." },
+            { p: "¿Qué es el $\\text{EER}$ (Energy Efficiency Ratio)?", ops: ["El consumo eléctrico anual.", "La eficiencia en modo calefacción.", "Relación entre potencia frigorífica y potencia eléctrica consumida.", "El ruido del equipo."], c: 2, exp: "El $\\text{EER}$ es la relación entre la capacidad de refrigeración (BTU/h o Frigorías/h) y la potencia eléctrica consumida (Watts). A mayor $\\text{EER}$, mayor eficiencia." },
+            { p: "¿Qué proceso ocurre en la unidad interior (evaporador)?", ops: ["El refrigerante líquido se evapora.", "El refrigerante gaseoso se condensa.", "El aire se presuriza.", "El aire se humidifica."], c: 0, exp: "El refrigerante líquido se evapora (cambia a gas) absorbiendo el calor del aire de la habitación que pasa a través de las aletas, enfriándolo." },
+            { p: "¿Cuál es el principal propósito del 'termostato' en un equipo de $\\text{A/C}$?", ops: ["Deshumidificar el ambiente.", "Indicarle al compresor cuándo detenerse o modular la potencia.", "Medir la presión del gas.", "Filtrar el aire."], c: 1, exp: "El termostato es el sensor que le indica a la unidad cuándo el ambiente ha alcanzado la temperatura deseada, deteniendo o modulando el compresor para mantener el setpoint." },
+            { p: "¿Qué significa que un equipo Split sea 'Inverter'?", ops: ["Que es de muy baja potencia.", "Que solo funciona en frío.", "Que su compresor funciona a velocidad fija.", "Que su compresor varía la velocidad de rotación para modular la potencia."], c: 3, exp: "La tecnología Inverter permite al compresor variar su velocidad, lo que se traduce en mayor estabilidad de temperatura, menor consumo eléctrico y mayor vida útil del equipo." },
+            { p: "¿Qué función tiene la válvula de expansión o capilar en el ciclo?", ops: ["Comprimir el gas.", "Aumentar la presión del líquido.", "Reducir bruscamente la presión del refrigerante.", "Evacuar el agua condensada."], c: 2, exp: "Reduce bruscamente la presión del refrigerante líquido que viene del condensador, provocando que se enfríe antes de que entre al evaporador (el punto de enfriamiento)." },
+            { p: "¿Qué se recomienda hacer antes de cargar refrigerante a un sistema?", ops: ["Realizar un vacío para eliminar aire y humedad.", "Añadir lubricante al compresor.", "Probar la estanqueidad con agua.", "Calentar las tuberías."], c: 0, exp: "Es fundamental realizar un vacío (con bomba de vacío) para eliminar el aire y la humedad (no condensables) del circuito, que dañarían el compresor y la eficiencia de enfriamiento." },
+            { p: "¿Qué elemento se instala en un ducto para distribuir el aire en diferentes direcciones?", ops: ["Filtro.", "Rejillas o difusores.", "Batería de expansión.", "Termostato."], c: 1, exp: "Las rejillas o difusores se colocan en el final del ducto, en el techo o pared, para inyectar o extraer el aire de manera controlada y uniforme en el ambiente." },
+            { p: "¿Qué riesgo existe si se sobredimensiona un equipo de $\\text{A/C}$?", ops: ["Ciclos cortos, baja deshumidificación y ambiente húmedo.", "Baja eficiencia frigorífica.", "Formación de hielo en el condensador.", "Fugas de refrigerante."], c: 0, exp: "Un equipo muy grande se enciende y apaga rápidamente ('ciclos cortos'), lo que reduce el tiempo de contacto con el evaporador, resultando en una mala deshumidificación." },
+            { p: "¿Qué es la 'temperatura de bulbo húmedo'?", ops: ["La temperatura del aire sin humedad.", "La temperatura que indica el termostato.", "La temperatura a la que se congela el agua.", "La temperatura medida por un termómetro cubierto con una mecha húmeda."], c: 3, exp: "Es la temperatura medida por un termómetro cubierto con una mecha húmeda, vital para determinar la humedad relativa y la entalpía (contenido energético) del aire." },
+            { p: "En un $\\text{VRV}$ o $\\text{VRF}$ (Volumen/Flujo de Refrigerante Variable), ¿qué permite?", ops: ["Solo refrigerar grandes áreas.", "Controlar el flujo de agua.", "Conectar múltiples unidades interiores a una sola unidad exterior, con control independiente.", "Usar refrigerantes naturales."], c: 2, exp: "Permite conectar múltiples unidades interiores (zonas) a una sola unidad exterior Inverter, controlando la cantidad de refrigerante que fluye a cada zona de forma precisa." },
+            { p: "¿Cuál es la función principal de la unidad exterior (condensador)?", ops: ["Evaporar el refrigerante.", "Comprimir el refrigerante.", "Absorber el calor del ambiente exterior.", "Liberar el calor absorbido de la habitación al aire exterior."], c: 3, exp: "Es donde el refrigerante gaseoso a alta presión libera el calor (se condensa) al aire exterior. Este calor es el que fue absorbido en la unidad interior." },
+            { p: "¿Qué problema indica la formación de hielo en el caño más grueso de un Split? (Tubería de baja presión)", ops: ["Exceso de refrigerante.", "Falta de refrigerante o bajo flujo de aire.", "Compresor dañado.", "Válvula inversora en mal estado."], c: 1, exp: "Este síntoma usualmente significa que la presión en el evaporador es demasiado baja. Puede ser por fuga de gas o por bajo intercambio térmico (filtro sucio, ventilador lento)." },
+            { p: "¿Qué se mide en $\\text{BTU}$/h (British Thermal Units por hora)?", ops: ["La capacidad de calefacción o refrigeración (potencia).", "La energía consumida.", "La presión del refrigerante.", "La temperatura del aire."], c: 0, exp: "Es una medida de la capacidad de calefacción o refrigeración (potencia), que indica cuánta energía térmica puede mover el equipo por hora." },
+            { p: "¿Por qué es importante la inclinación en la bandeja de desagüe de un Split?", ops: ["Para evitar el ruido.", "Para mejorar la condensación.", "Para que el agua de condensación drene por gravedad.", "Para recircular el agua."], c: 2, exp: "Para que el agua de condensación (generada en el evaporador por deshumidificación) pueda drenar correctamente por gravedad y no desborde hacia el interior de la habitación." },
+            { p: "¿Cuál es la temperatura ideal de confort térmico en verano según normativas generales?", ops: ["$18^{\\circ}C$.", "$22^{\\circ}C$.", "$20^{\\circ}C$ a $22^{\\circ}C$.", "$24^{\\circ}C$ a $26^{\\circ}C$."], c: 3, exp: "Se recomienda mantener el ambiente entre $24^{\\circ}C$ y $26^{\\circ}C$ para lograr confort y eficiencia energética, evitando grandes saltos térmicos con el exterior." },
+            { p: "¿Qué es un serpentín?", ops: ["El compresor.", "El nombre técnico de los intercambiadores de calor (evaporador/condensador).", "Un tipo de refrigerante.", "La válvula de expansión."], c: 1, exp: "Es el nombre técnico dado a los intercambiadores de calor (evaporador y condensador) formados por tubos aleteados por donde circula el refrigerante para facilitar la transferencia térmica." },
+            { p: "¿Cómo funciona un ciclo de $\\text{A/C}$ en modo 'Calefacción' (Bomba de Calor)?", ops: ["Se añade una resistencia eléctrica.", "Una válvula inversora cambia el flujo del refrigerante.", "Se aumenta la velocidad del ventilador.", "Se quema gas dentro de la unidad."], c: 1, exp: "Una válvula inversora (cuatro vías) cambia el flujo del refrigerante, haciendo que la unidad interior funcione como condensador (emitiendo calor) y la exterior como evaporador." },
+            { p: "¿Qué es el $\\text{COP}$ (Coefficient of Performance)?", ops: ["El consumo eléctrico.", "La capacidad frigorífica.", "El caudal de aire.", "La eficiencia en modo calefacción (Potencia térmica entregada / Potencia eléctrica consumida)."], c: 3, exp: "Es la relación entre la potencia térmica entregada (calor) y la potencia eléctrica consumida, usado para medir la eficiencia de la bomba de calor en modo calefacción." },
+            { p: "¿Qué componente se utiliza para filtrar partículas y humedad en el refrigerante?", ops: ["El filtro secador o deshidratador.", "El termostato.", "La válvula de expansión.", "El ventilador."], c: 0, exp: "El filtro secador o deshidratador se coloca en la línea de líquido para proteger el sistema de contaminantes sólidos y especialmente de la humedad, que es muy dañina para el compresor." },
+            { p: "¿Qué causa el típico goteo de agua de la unidad exterior en modo refrigeración?", ops: ["Fuga de refrigerante.", "Lluvia.", "Es la condensación de la humedad del aire interior en el evaporador, drenada al exterior.", "Agua de la bomba."], c: 2, exp: "En refrigeración, el aire interior húmedo se enfría al pasar por el evaporador. La humedad se condensa en agua (deshumidificación) y se recoge en la bandeja de drenaje, que va al exterior." },
+            { p: "¿Qué es la 'Ventilación' en $\\text{A/C}$?", ops: ["El movimiento de aire interior.", "El proceso de introducir aire exterior y extraer aire interior viciado.", "La recirculación del aire interno.", "El modo de solo ventilador del equipo."], c: 1, exp: "Es el proceso de introducir aire exterior (nuevo/fresco) y extraer aire interior (viciado) para mantener la calidad del aire y cumplir con las tasas de renovación." },
+            { p: "¿Cuál es la temperatura de condensación normal del refrigerante en la unidad exterior?", ops: ["$-5^{\\circ}C$.", "$10^{\\circ}C$ a $20^{\\circ}C$.", "$45^{\\circ}C$ a $55^{\\circ}C$.", "$80^{\\circ}C$."], c: 2, exp: "Debe ser significativamente superior a la temperatura exterior (ej. $45^{\\circ}C$ a $55^{\\circ}C$) para que el calor pueda fluir del refrigerante al aire ambiente." },
+            { p: "¿Qué problema surge si el caño más fino (líquido) de un Split se congela?", ops: ["Exceso de refrigerante.", "Falta de lubricante.", "Válvula inversora en modo incorrecto.", "Restricción o bloqueo en la línea de líquido o expansión."], c: 3, exp: "El caño fino frío y con hielo indica típicamente una restricción severa, lo que provoca una caída de presión prematura y evaporación antes de la válvula de expansión." },
+            { p: "¿Qué material se utiliza principalmente para las tuberías de refrigeración en sistemas Split?", ops: ["Aluminio.", "Acero al carbono.", "Cobre.", "PVC."], c: 2, exp: "Se utiliza el cobre por su excelente conductividad térmica, su maleabilidad para las interconexiones y su resistencia a la corrosión por los refrigerantes." },
+            { p: "¿Cuál es el riesgo de un $\\text{A/C}$ si la temperatura exterior es muy baja en modo calefacción?", ops: ["Baja presión en el condensador.", "Pierde eficiencia y requiere el ciclo de 'descongelamiento'.", "Se sobrecalienta el compresor.", "El gas se expande demasiado."], c: 1, exp: "El intercambio de calor en la unidad exterior (que opera como evaporador) se vuelve muy ineficiente, requiriendo resistencias de apoyo y activando ciclos de descongelamiento del hielo (defrost)." },
+            { p: "¿Qué indica la etiqueta $\\text{A+++}$ en un $\\text{A/C}$ en Argentina?", ops: ["Su potencia frigorífica.", "Su capacidad de deshumidificación.", "Su eficiencia energética (consumo eléctrico).", "Su nivel de ruido."], c: 2, exp: "La clasificación energética (etiqueta A, A+, A++, etc.) indica su eficiencia energética (consumo eléctrico) bajo condiciones estándar, siendo A+++ el más eficiente." }
+        ],
+
+        // TEMA 6: TRANSMITANCIA Y BALANCE TÉRMICO (NUEVO)
+        transmitancia: [
+            { p: "En Argentina, ¿qué letra se utiliza comúnmente para el coeficiente de transmitancia térmica (equivalente a $U$ internacional)?", ops: ["Letra $\\lambda$.", "Letra $R$.", "Letra $L$.", "Letra $K$."], c: 3, exp: "Se utiliza históricamente la letra $K$ para la Transmitancia Térmica ($W/m^2K$). $U$ es la designación internacional. $\\lambda$ es la Conductividad." },
+            { p: "¿Qué mide el coeficiente de Transmitancia Térmica $K$ (o $U$)?", ops: ["La resistencia al flujo de calor.", "La cantidad de calor que atraviesa un elemento constructivo.", "La capacidad de un material para almacenar calor.", "La diferencia de temperatura interior/exterior."], c: 1, exp: "Mide la cantidad de calor que atraviesa $1$ $m^2$ de un elemento constructivo (muro, techo) por cada grado Kelvin de diferencia de temperatura. A menor $\\text{K}$, mejor aislamiento." },
+            { p: "¿Cuál es la unidad de medida del Coeficiente $K$?", ops: ["$W/m^2K$.", "$W/mK$.", "$m^2K/W$.", "$J/m^2K$."], c: 0, exp: "La unidad es $W/m^2K$ (Watts por metro cuadrado y Kelvin). El inverso es la resistencia térmica $R$ ($m^2K/W$)." },
+            { p: "¿Qué es la $R$ térmica (Resistencia Térmica)?", ops: ["La cantidad de calor perdida.", "La conductividad del material.", "El inverso del flujo de calor.", "La capacidad de un material de oponerse al flujo de calor."], c: 3, exp: "Es la capacidad de un material de oponerse al flujo de calor. Es el inverso de la Transmitancia $K$ ($R = 1/K$) y se mide en $m^2K/W$." },
+            { p: "En un muro multicapa, ¿cómo se calcula la $R$ total?", ops: ["Multiplicando las $R$ de cada capa.", "Sumando las $R$ de cada capa más las resistencias superficiales.", "Dividiendo las $R$ de cada capa.", "Promediando las $R$ de cada capa."], c: 1, exp: "Las resistencias térmicas de las capas se suman: $R_{\\text{total}} = \\sum R_i$. Esta es la base del cálculo de $K$ para envolventes compuestas." },
+            { p: "¿Qué representa el término $R_{\\text{aire}}$ en el cálculo de $K$?", ops: ["La resistencia superficial interior y exterior (convección y radiación).", "La conductividad del aire en el aislante.", "La humedad del aire.", "El flujo de aire por filtración."], c: 0, exp: "Representa las resistencias superficiales (limite) interior y exterior debidas a la transferencia de calor por convección y radiación entre el aire y la superficie del muro." },
+            { p: "¿Cuál es el objetivo principal de realizar un Balance Térmico de un edificio?", ops: ["Determinar la cantidad de materiales necesarios.", "Calcular el costo energético.", "Cuantificar las ganancias y pérdidas de calor para dimensionar el equipo de A/C.", "Determinar el consumo eléctrico total."], c: 2, exp: "El objetivo es cuantificar todas las pérdidas y ganancias de calor para dimensionar con precisión la potencia térmica (calor o frío) que necesita el equipo de $\\text{A/C}$ o calefacción." },
+            { p: "¿Qué tipo de pérdida de calor es la más difícil de reducir en un edificio bien aislado?", ops: ["Pérdidas por conducción a través del muro.", "Pérdidas por el techo.", "Pérdidas por las ventanas.", "Pérdidas por ventilación o infiltración de aire."], c: 3, exp: "Las pérdidas por ventilación o infiltración (renovación de aire no deseada) son difíciles de controlar completamente sin sellado hermético y sistemas de recuperación de calor." },
+            { p: "¿Qué es la 'Conductividad Térmica' ($\\lambda$ o $k$)?", ops: ["La resistencia total de un muro.", "La capacidad intrínseca de un material homogéneo de conducir el calor.", "El inverso de la transmitancia.", "El calor almacenado."], c: 1, exp: "Mide la capacidad intrínseca de un material homogéneo de conducir el calor, independientemente de su espesor. Se mide en $W/mK$." },
+            { p: "En el Balance Térmico, ¿qué se considera una 'Ganancia Sensible' de calor?", ops: ["Calor que aumenta la temperatura del aire ambiente (ej. solar, personas, luces).", "Humedad del aire exterior.", "Calor de la evaporación del agua.", "Infiltración de vapor."], c: 0, exp: "Es el calor que aumenta la temperatura del aire ambiente (lo que se siente), proveniente de la radiación solar a través de ventanas, personas, iluminación y equipos." },
+            { p: "¿Qué es una 'Ganancia Latente' de calor?", ops: ["El calor de la pared.", "La energía de la radiación solar.", "El calor asociado a los cambios de estado del agua (humedad).", "El calor de la iluminación."], c: 2, exp: "Es el calor asociado a los cambios de estado del agua (evaporación/condensación), como la humedad aportada por personas o cocción, que no afecta la temperatura sensible." },
+            { p: "¿Qué factor es la mayor ganancia de calor en un edificio durante el verano?", ops: ["Luces artificiales.", "Radiación solar a través de ventanas.", "Personas.", "Equipos eléctricos."], c: 1, exp: "La radiación solar que ingresa a través de las ventanas (ganancia solar a través de vidrio) es típicamente el componente más grande a remover por el $\\text{A/C}$." },
+            { p: "¿Qué es un 'Puente Térmico' (o Puente de Frío)?", ops: ["Un área con aislamiento excesivo.", "Una discontinuidad en el flujo de aire.", "Una capa aislante adicional.", "Una zona de la envolvente donde la resistencia térmica es menor, facilitando el escape/ingreso de calor."], c: 3, exp: "Es una zona puntual o lineal de la envolvente donde la resistencia térmica es menor (ej. encuentros de losas con muros), generando una vía de escape o ingreso de calor." },
+            { p: "¿Cómo se pueden reducir las pérdidas por Puentes Térmicos?", ops: ["Utilizando aislamiento continuo por el exterior (ej. $\\text{EIFS}$ o $\\text{SATE}$).", "Aumentando la masa térmica del muro.", "Utilizando ventanas de triple vidrio.", "Aumentando la temperatura de impulsión de calefacción."], c: 0, exp: "Aplicando aislamiento continuo por el exterior (ej. $\\text{EIFS}$ o $\\text{SATE}$) que envuelve completamente la estructura y elimina las discontinuidades de la envolvente." },
+            { p: "¿Cuál es la principal función de la 'barrera de vapor' en un muro?", ops: ["Impedir el paso del aire.", "Reducir la radiación solar.", "Controlar la difusión de vapor de agua para evitar la condensación interna.", "Aumentar la resistencia superficial."], c: 2, exp: "Controlar la difusión de vapor de agua a través de la envolvente para evitar que condense dentro de la capa aislante (punto de rocío), lo que reduce la eficiencia y puede causar daños." },
+            { p: "¿Qué tipo de vidrio tiene el $K$ más bajo (mayor aislamiento)?", ops: ["Vidrio simple.", "Doble Vidriado Hermético (DVH) con aire.", "Doble Vidriado Hermético (DVH) con gas argón.", "DVH con Argón y capa Low-E."], c: 3, exp: "El $\\text{DVH}$ con gas argón y capa $\\text{Low-E}$ (baja emisividad) es el más aislante, ya que reduce drásticamente las pérdidas por conducción (gas) y radiación (capa metálica)." },
+            { p: "¿Qué efecto tiene la masa térmica (ej. paredes de ladrillo pesado) en el balance térmico?", ops: ["Acelera el calentamiento.", "Amortigua y retrasa la transferencia de calor, reduciendo las demandas pico.", "Aumenta la infiltración de aire.", "Aumenta la conductividad."], c: 1, exp: "La masa amortigua y retrasa la transferencia de calor a través de la envolvente (inercia), reduciendo las demandas pico de $\\text{A/C}$ o calefacción, ideal en climas con grandes variaciones día/noche." },
+            { p: "En el balance, ¿la infiltración de aire se considera una...?", ops: ["Pérdida o ganancia de calor sensible y latente.", "Ganancia latente solamente.", "Ganancia sensible solamente.", "Pérdida de calor por conducción."], c: 0, exp: "La infiltración introduce aire exterior con diferente temperatura (sensible) y humedad (latente) respecto al interior, por lo que afecta ambos componentes del balance." },
+            { p: "¿Qué material de aislamiento tiene típicamente la menor conductividad ($\\lambda$)?", ops: ["Ladrillo hueco.", "Lana de vidrio.", "Poliuretano (PUR) o Poliisocianurato (PIR).", "Hormigón."], c: 2, exp: "El Poliuretano (PUR o PIR) o el Poliestireno Extruido (XPS) tienen valores muy bajos de $\\lambda$, lo que los hace excelentes aislantes, superando a la lana de vidrio." },
+            { p: "Si un muro tiene $K = 1.5$ $W/m^2K$, y la diferencia de temperatura es $10K$, ¿cuánto calor pierde?", ops: ["$15$ $W/m^2$.", "$150$ $W/m^2$.", "$1.5$ $W/m^2$.", "$1500$ $W/m^2$."], c: 0, exp: "La pérdida de calor $Q = K \\times \\Delta T = 1.5 \\times 10 = 15$ $W/m^2$." },
+            { p: "¿Qué indica la sigla $\\text{IRAM 11601}$ en Argentina?", ops: ["Normas de incendio.", "Requisitos de $\\text{A/C}$.", "Reglamento de calderas.", "Establece las condiciones de habitabilidad térmica y los valores límite de $K$ (Transmitancia)."], c: 3, exp: "Esta norma argentina establece las condiciones de habitabilidad en términos de acondicionamiento térmico y los valores límite de $K$ (transmitancia) para la envolvente en diferentes zonas bioclimáticas del país." },
+            { p: "¿Qué es el $\\text{ASHRAE}$?", ops: ["Una norma argentina de balance térmico.", "La Sociedad Americana de Ingenieros de Calefacción, Refrigeración y $\\text{A/C}$ (referencia mundial).", "Un tipo de aislante.", "El coeficiente de conductividad."], c: 1, exp: "Es la Sociedad Americana de Ingenieros de Calefacción, Refrigeración y $\\text{A/C}$, y sus guías de diseño son la referencia mundial para los balances térmicos y diseño de sistemas $\\text{HVAC}$." },
+            { p: "¿Cuál es el factor principal que debe considerar un ingeniero al elegir el espesor del aislante?", ops: ["El costo del material.", "El tipo de acabado exterior.", "La zona bioclimática y el valor máximo de $K$ permitido por normativa local.", "El peso del aislante."], c: 2, exp: "La decisión principal se basa en cumplir la normativa de la zona bioclimática (ej. Zona III, IV según IRAM) que exige un valor máximo de $\\text{K}$." },
+            { p: "¿Qué es el $\\text{GSH}$ (Ganancia de Calor Horaria)?", ops: ["El calor total que se acumula en un ambiente por hora.", "La pérdida de calor por ventilación.", "El caudal de aire.", "La temperatura máxima."], c: 0, exp: "Es el calor total (sensible y latente) que se acumula en un ambiente por hora (solar, personas, equipos) que debe ser removido por el equipo de $\\text{A/C}$." },
+            { p: "¿Para qué sirve un psicrómetro en el balance térmico?", ops: ["Medir la presión del aire.", "Es un instrumento para medir la humedad relativa y las temperaturas de bulbo seco/húmedo.", "Medir el caudal de aire.", "Medir la conductividad."], c: 1, exp: "Es un instrumento para medir la humedad relativa y la temperatura de bulbo húmedo y seco del aire, datos esenciales para calcular las ganancias latentes." },
+            { p: "¿Cómo afecta la orientación Norte de una ventana en el Balance Térmico de verano en Argentina?", ops: ["Es la orientación con menor ganancia solar.", "Es la orientación con mayor ganancia solar, pero controlable con aleros horizontales.", "No tiene impacto.", "Recibe solo sol al atardecer."], c: 1, exp: "La orientación Norte es la que recibe la mayor cantidad de radiación solar durante el día. En el hemisferio Sur es la más caliente, aunque es la más fácil de controlar con elementos de sombra horizontales fijos." },
+            { p: "¿Qué se logra al reducir el coeficiente $K$ de la envolvente?", ops: ["Mayor consumo eléctrico.", "Menor inercia térmica.", "Mayor aislamiento y menor demanda energética.", "Se aumenta la temperatura interna."], c: 2, exp: "Se logra un mayor aislamiento térmico, lo que reduce las pérdidas/ganancias de calor y, por lo tanto, reduce la demanda de calefacción y refrigeración (mayor ahorro)." },
+            { p: "¿Qué ganancia de calor es constante en una oficina?", ops: ["El calor emitido por las personas y los equipos eléctricos.", "La ganancia solar a través del techo.", "La infiltración de aire.", "El calor que sale por la puerta."], c: 0, exp: "El calor emitido por las personas y los equipos eléctricos (computadoras, luces) es una ganancia de calor interna predecible que se da mientras la oficina está ocupada." },
+            { p: "¿Cuál es el riesgo de aislar un muro sin barrera de vapor en un clima frío/húmedo?", ops: ["El muro se agrieta.", "El vapor de agua condensa dentro del aislante, mojándolo y reduciendo drásticamente su $R$ térmica.", "Se aumenta la conductividad.", "Aumenta la presión de aire."], c: 1, exp: "El vapor de agua del interior migra hacia la zona fría y condensa dentro del aislante (punto de rocío), mojándolo, lo que reduce drásticamente su capacidad aislante." },
+            { p: "¿Qué valor se utiliza para las temperaturas de diseño exterior en un balance térmico?", ops: ["La temperatura promedio anual.", "La temperatura máxima histórica.", "Temperaturas extremas de diseño (ej. $1\%$ de las horas más frías/calientes).", "La temperatura de confort interior."], c: 2, exp: "Se utilizan temperaturas extremas de diseño (ej. $1\%$ de las horas más frías/calientes del año) para dimensionar correctamente el equipo y asegurar que cubra las condiciones más críticas." }
         ]
     };
 
@@ -207,14 +363,25 @@
         // Tema y Título
         const numTema = Math.floor(Math.random() * 3) + 1;
         document.getElementById('badge-tema').innerText = `TEMA ${numTema}`;
-        document.getElementById('badge-tema').style.backgroundColor = tema === 'acustica' ? '#3498db' : '#e67e22';
         
-        const titulos = { acustica: "Práctica de Acústica", luminotecnia: "Práctica de Luminotecnia" };
+        const titulos = { 
+            acustica: "Práctica de Acústica", 
+            luminotecnia: "Práctica de Luminotecnia",
+            calefaccion_agua: "Práctica de Calefacción por Agua",
+            incendios: "Práctica de Incendios y Seguridad",
+            aire_acondicionado: "Práctica de Aire Acondicionado",
+            transmitancia: "Práctica de Transmitancia y Balance Térmico"
+        };
         document.getElementById('titulo-tema').innerText = titulos[tema];
+
+        // Cambiar color del badge según el tema
+        const colores = { acustica: '#3498db', luminotecnia: '#e67e22', calefaccion_agua: '#2ecc71', incendios: '#c0392b', aire_acondicionado: '#8e44ad', transmitancia: '#2c3e50' };
+        document.getElementById('badge-tema').style.backgroundColor = colores[tema];
+
 
         // Selección de preguntas
         const todasLasPreguntas = mezclar(bancoPreguntas[tema]);
-        preguntasExamen = todasLasPreguntas.slice(0, 10);
+        preguntasExamen = todasLasPreguntas.slice(0, 10); // Cortamos las primeras 10
 
         // Renderizado
         const contenedor = document.getElementById('quiz-container');
@@ -226,7 +393,9 @@
             
             let titulo = document.createElement('span');
             titulo.className = "question-title";
-            titulo.innerText = `${index + 1}. ${item.p}`;
+            // Eliminar números escritos a mano para la mezcla
+            let textoPregunta = item.p.replace(/^\d+\.\s/, '');
+            titulo.innerText = `${index + 1}. ${textoPregunta}`;
             bloque.appendChild(titulo);
 
             let divOpciones = document.createElement('div');
@@ -239,7 +408,6 @@
             });
             bloque.appendChild(divOpciones);
 
-            // Div de Explicación (Oculto al principio)
             let feedback = document.createElement('div');
             feedback.id = `feedback-${index}`;
             feedback.className = "feedback";
@@ -261,10 +429,9 @@
 
             for (let radio of opciones) {
                 if (radio.checked) seleccionado = parseInt(radio.value);
-                radio.disabled = true;
+                radio.disabled = true; // Bloquear inputs
             }
 
-            // Generar HTML de la explicación
             let htmlFeedback = "";
             
             if (seleccionado === item.c) {
@@ -273,13 +440,12 @@
                 htmlFeedback += `<p><strong>✅ ¡Correcto!</strong></p>`;
             } else {
                 feedbackDiv.className = "feedback incorrect";
-                let respDada = seleccionado !== null ? item.ops[seleccionado] : "Ninguna";
                 let respCorrecta = item.ops[item.c];
                 htmlFeedback += `<p class="incorrect-label">❌ Incorrecto</p>`;
                 htmlFeedback += `<p>Respuesta correcta: <strong>${respCorrecta}</strong></p>`;
             }
             
-            // AGREGAR LA EXPLICACIÓN TÉCNICA SIEMPRE (Didáctico)
+            // AGREGAR LA EXPLICACIÓN TÉCNICA
             htmlFeedback += `<hr style="border: 0; border-top: 1px solid rgba(0,0,0,0.1); margin: 10px 0;">`;
             htmlFeedback += `<span class="explanation-title">Justificación:</span>`;
             htmlFeedback += `<span>${item.exp}</span>`;
@@ -299,7 +465,7 @@
             divFinal.style.color = "#155724";
             divFinal.style.borderColor = "#c3e6cb";
         } else {
-            divFinal.style.backgroundColor = "#fff3cd"; // Amarillo suave para no ser tan agresivo
+            divFinal.style.backgroundColor = "#fff3cd"; 
             divFinal.style.color = "#856404";
             divFinal.style.borderColor = "#ffeeba";
         }
