@@ -3,26 +3,30 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cuestionario Técnico</title>
+    <title>Cuestionarios IC2</title>
     <style>
+        /* Estilos para el contenedor: asegura que el iframe ocupe bien la pantalla */
         body {
-            /* Asegúrate de que tu cuerpo no tenga márgenes para que el iframe llene la pantalla */
+            /* Restablece márgenes para una integración limpia */
             margin: 0;
             padding: 0;
-            background-color: #f4f4f4; /* Mismo fondo que la app */
+            background-color: #f4f4f4; 
+            font-family: Arial, sans-serif;
             display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh; /* Para que ocupe toda la altura de la ventana */
+            justify-content: center; /* Centra horizontalmente */
+            align-items: flex-start; /* Alinea al inicio verticalmente (arriba) */
+            min-height: 100vh; /* Altura mínima del 100% de la ventana */
         }
         #app-container {
+            /* Dimensiones y estilos del marco (iframe) */
             width: 100%;
-            max-width: 950px; /* Un poco más grande que el max-width de la aplicación (900px) */
-            height: 90vh; /* Ocupa el 90% de la altura de la ventana */
+            max-width: 950px; /* Tamaño máximo para centrar el contenido */
+            height: 95vh; /* Ocupa la mayor parte de la altura de la ventana */
             border: none;
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
             border-radius: 8px;
-            overflow: hidden; /* Para que el contenido interno se vea bien */
+            overflow: hidden; 
+            margin: 20px 0; /* Margen superior e inferior para que no toque los bordes */
         }
     </style>
 </head>
@@ -30,18 +34,9 @@
 
     <iframe 
         id="app-container"
-        src="https://script.google.com/macros/s/AKfycbwo_xcmDJB7d4C3vMjx2DB5lsiC7tHtLngea9K8O5lORXL_wHzFaFSubTcroBWrJU2igQ/exec"
+        src="https://script.google.com/macros/s/AKfycbwo_xcmDJB7d4C3vMjx2DB5lsiC7tHtLngea9K8O5lORXL_wHzFaFSubTcroBWrJU2igQ/exec" 
         title="Aplicación de Cuestionario Google Apps Script">
     </iframe>
 
-    <script>
-        // Si necesitas que la altura sea dinámica (opcional)
-        window.addEventListener('load', function() {
-            const iframe = document.getElementById('app-container');
-            // La URL de Google Apps Script a insertar.
-            const googleAppUrl = "https://script.google.com/macros/s/AKfycbwo_xcmDJB7d4C3vMjx2DB5lsiC7tHtLngea9K8O5lORXL_wHzFaFSubTcroBWrJU2igQ/exec";
-            iframe.src = googleAppUrl;
-        });
-    </script>
 </body>
 </html>
