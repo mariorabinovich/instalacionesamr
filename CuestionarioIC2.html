@@ -1,41 +1,321 @@
 <!DOCTYPE html>
-<html lang="es">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cargando Banco de Preguntas Técnico...</title>
+  <base target="_top">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    /* Estilos basados en tu imagen */
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      margin: 0;
+      padding: 20px;
+      background-color: #f4f4f4;
+    }
+    .container {
+      max-width: 900px;
+      margin: auto;
+    }
+    h1 {
+      color: #333;
+      font-size: 2.5em;
+      margin-bottom: 5px;
+    }
+    p {
+      color: #666;
+      margin-bottom: 30px;
+    }
+    .modulo-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 20px;
+      margin-top: 40px;
+    }
+    .modulo-btn {
+      padding: 40px 20px;
+      border-radius: 10px;
+      color: white;
+      font-size: 1.2em;
+      font-weight: bold;
+      cursor: pointer;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      transition: transform 0.2s, opacity 0.2s;
+    }
+    .modulo-btn:hover {
+      transform: translateY(-3px);
+      opacity: 0.9;
+    }
+    /* Colores aproximados de tu imagen */
+    .color-1 { background-color: #1e88e5; }
+    .color-2 { background-color: #ffb300; }
+    .color-3 { background-color: #43a047; }
+    .color-4 { background-color: #e53935; }
+    .color-5 { background-color: #8e24aa; }
+    .color-6 { background-color: #37474f; }
     
-    <meta http-equiv="refresh" content="0; url=https://script.google.com/macros/s/AKfycbxsyGVm8ANjGPhqO34QdNXYp7K02O9_iy--42Wjx_ptG9-Xr-hp9MRc0WizQ9bR_aX-8w/exec">
+    /* Estilos para el cuestionario (oculto inicialmente) */
+    #cuestionario-view {
+      display: none;
+      text-align: left;
+      background-color: white;
+      padding: 30px;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+    .pregunta {
+      margin-bottom: 25px;
+      border-bottom: 1px solid #eee;
+      padding-bottom: 15px;
+    }
+    .opcion-label {
+      display: block;
+      margin: 10px 0;
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    input[type="radio"] {
+        margin-right: 10px;
+    }
+    .submit-btn {
+        background-color: #1e88e5;
+        color: white;
+        padding: 12px 25px;
+        border: none;
+        border-radius: 5px;
+        font-size: 1.1em;
+        cursor: pointer;
+        margin-top: 20px;
+    }
     
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            text-align: center;
-            padding-top: 50px;
-            color: #333;
-        }
-        .loader {
-            border: 4px solid #f3f3f3;
-            border-top: 4px solid #3498db;
-            border-radius: 50%;
-            width: 30px;
-            height: 30px;
-            animation: spin 2s linear infinite;
-            margin: 20px auto;
-        }
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-    </style>
+    /* Estilos para la vista de resultados */
+    #resultado-view {
+        display: none;
+        text-align: left;
+        padding: 30px;
+        background-color: #e8f5e9; 
+        border-radius: 8px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+    .respuesta-correcta {
+        color: green;
+        font-weight: bold;
+    }
+    .explicacion {
+        border-left: 3px solid #1e88e5;
+        padding-left: 10px;
+        margin-top: 10px;
+        font-style: italic;
+        font-size: 0.9em;
+    }
+    /* Estilos para impresión */
+    @media print {
+        body { background-color: white; }
+        .container { max-width: 100%; box-shadow: none; }
+        .submit-btn, button[onclick="location.reload()"] { display: none !important; }
+        .pregunta { page-break-inside: avoid; }
+    }
+  </style>
 </head>
 <body>
-    <div class="loader"></div>
-    <h1>Cargando Cuestionario...</h1>
-    <p>Serás redirigido automáticamente a la aplicación de Google Scripts.</p>
-    <p style="font-size: 0.9em; margin-top: 40px;">
-        Si la redirección no funciona, haz clic aquí: 
-        <a href="https://script.google.com/macros/s/AKfycbxsyGVm8ANjGPhqO34QdNXYp7K02O9_iy--42Wjx_ptG9-Xr-hp9MRc0WizQ9bR_aX-8w/exec">Iniciar Cuestionario</a>
-    </p>
+<div class="container">
+
+  <div id="seleccion-view">
+      <h1>PRÁCTICA</h1>
+      <p>Seleccione el módulo técnico a evaluar (10 preguntas aleatorias por intento)</p>
+      
+      <div class="modulo-grid" id="modulo-grid">
+          <p id="cargando-temas">Cargando módulos...</p>
+      </div>
+      
+      <p style="margin-top: 50px;">Cada intento selecciona 10 preguntas al azar de un banco de 30, asegurando la variabilidad.</p>
+  </div>
+
+  <div id="cuestionario-view">
+      <h2 id="titulo-cuestionario">Cuestionario: Tema X</h2>
+      <form id="quiz-form">
+          </form>
+      <button class="submit-btn" onclick="corregirCuestionario()">Finalizar y Corregir</button>
+  </div>
+
+  <div id="resultado-view">
+      <h2>Resultados de la Práctica</h2>
+      <p>Tu puntuación es: <span id="puntuacion-final"></span></p>
+      <div id="respuestas-revisadas">
+          </div>
+      <button class="submit-btn" style="margin-right: 15px;" onclick="imprimirCuestionario()">Generar PDF (Imprimir)</button>
+      <button class="submit-btn" onclick="location.reload()">Nuevo Intento</button>
+  </div>
+
+
+</div>
+
+<script>
+    const colors = ['color-1', 'color-2', 'color-3', 'color-4', 'color-5', 'color-6', 'color-1', 'color-2'];
+    let preguntasGlobal = []; 
+    let startTime; 
+    let userName = '';
+    
+    // --- LÓGICA DE CARGA INICIAL (GENERAR BOTONES) ---
+    function cargarModulos() {
+        google.script.run
+              .withSuccessHandler(generarBotones)
+              .withFailureHandler(mostrarError)
+              .getTemas();
+    }
+    
+    function generarBotones(temas) {
+        const grid = document.getElementById('modulo-grid');
+        grid.innerHTML = '';
+        
+        if (temas.length === 0) {
+            grid.innerHTML = '<p style="color: red;">Error: No se encontraron temas en la Hoja de Cálculo. Revise el encabezado "Tema" en la columna B.</p>';
+            return;
+        }
+
+        temas.forEach((tema, index) => {
+            const button = document.createElement('div');
+            button.className = `modulo-btn ${colors[index % colors.length]}`; 
+            button.innerHTML = `${index + 1}. ${tema}`;
+            button.onclick = () => solicitarNombreYIniciar(tema);
+            grid.appendChild(button);
+        });
+    }
+
+    // --- LÓGICA: SOLICITAR NOMBRE ---
+    function solicitarNombreYIniciar(tema) {
+        const nombre = prompt("Por favor, introduce tu nombre para iniciar la práctica:");
+        if (nombre && nombre.trim() !== '') {
+            userName = nombre.trim();
+            iniciarCuestionario(tema);
+        } else {
+            alert("El nombre es requerido para iniciar la sesión.");
+        }
+    }
+
+    // --- LÓGICA DE INICIO DEL CUESTIONARIO ---
+    function iniciarCuestionario(tema) {
+        startTime = Date.now(); 
+        
+        document.getElementById('seleccion-view').style.display = 'none';
+        document.getElementById('cuestionario-view').style.display = 'block';
+        document.getElementById('titulo-cuestionario').textContent = `Cuestionario de ${tema} (${userName})`;
+        
+        document.getElementById('quiz-form').innerHTML = '<p>Cargando 10 preguntas aleatorias...</p>';
+
+        google.script.run
+              .withSuccessHandler(renderizarCuestionario)
+              .withFailureHandler(mostrarError)
+              .getPreguntas(tema);
+    }
+    
+    function renderizarCuestionario(preguntas) {
+        preguntasGlobal = preguntas; 
+        const form = document.getElementById('quiz-form');
+        form.innerHTML = '';
+        
+        if (preguntas.length === 0) {
+            form.innerHTML = '<p style="color: red;">No se encontraron suficientes preguntas para este tema.</p>';
+            return;
+        }
+
+        preguntas.forEach((p, index) => {
+            const preguntaDiv = document.createElement('div');
+            preguntaDiv.className = 'pregunta';
+            preguntaDiv.innerHTML = `<h4>${index + 1}. ${p.pregunta}</h4>`;
+            
+            p.opciones.forEach((opcion, opIndex) => {
+                if (opcion && opcion.toString().trim() !== '') {
+                    const radioId = `q${index}-op${opIndex}`;
+                    preguntaDiv.innerHTML += `
+                        <label for="${radioId}" class="opcion-label">
+                            <input type="radio" id="${radioId}" name="pregunta-${index}" value="${opcion}">
+                            ${opcion}
+                        </label>
+                    `;
+                }
+            });
+            
+            form.appendChild(preguntaDiv);
+        });
+    }
+
+    // --- LÓGICA DE CORRECCIÓN Y REGISTRO ---
+    function corregirCuestionario() {
+        const endTime = Date.now();
+        const duracionSegundos = Math.round((endTime - startTime) / 1000);
+        let aciertos = 0;
+        
+        // CORRECCIÓN CLAVE: Definición correcta de totalPreguntas
+        const totalPreguntas = preguntasGlobal.length; 
+        
+        const form = document.getElementById('quiz-form');
+        const resultadosDiv = document.getElementById('respuestas-revisadas');
+        resultadosDiv.innerHTML = ''; 
+
+        // 1. Corregir y Renderizar
+        preguntasGlobal.forEach((p, index) => {
+            const respuestaUsuario = form.elements[`pregunta-${index}`] ? form.elements[`pregunta-${index}`].value : null;
+            const esCorrecta = respuestaUsuario === p.correcta;
+            
+            if (esCorrecta) {
+                aciertos++;
+            }
+
+            const resultadoHTML = `
+                <div class="pregunta">
+                    <h4>${index + 1}. ${p.pregunta}</h4>
+                    <p><strong>Tu Respuesta:</strong> ${respuestaUsuario ? respuestaUsuario : 'Sin responder'} ${esCorrecta ? '✅' : '❌'}</p>
+                    <p class="respuesta-correcta"><strong>Respuesta Correcta:</strong> ${p.correcta}</p>
+                    <div class="explicacion">
+                        <strong>Explicación:</strong> ${p.explicacion}
+                    </div>
+                </div>
+            `;
+            resultadosDiv.innerHTML += resultadoHTML;
+        });
+
+        // 2. Mostrar la puntuación final y ocultar vistas
+        document.getElementById('puntuacion-final').textContent = `${aciertos} de ${totalPreguntas} (Duración: ${duracionSegundos}s)`;
+        
+        document.getElementById('cuestionario-view').style.display = 'none';
+        document.getElementById('resultado-view').style.display = 'block';
+        
+        // 3. Registrar uso en Google Sheets (Apps Script)
+        const temaMatch = document.getElementById('titulo-cuestionario').textContent.match(/Cuestionario de (.*) \(/);
+        const tema = temaMatch ? temaMatch[1].trim() : "Desconocido";
+        
+        const userData = {
+            nombre: userName,
+            tema: tema,
+            aciertos: aciertos,
+            total: totalPreguntas, // ENVIAR ESTA VARIABLE AL SERVIDOR
+            duracion: duracionSegundos
+        };
+        
+        google.script.run
+              .withFailureHandler((e) => console.error("Error al registrar uso: ", e))
+              .registrarUso(userData);
+    }
+    
+    // --- LÓGICA DE IMPRESIÓN (PDF) ---
+    function imprimirCuestionario() {
+        window.print();
+    }
+
+    function mostrarError(error) {
+        document.getElementById('cargando-temas').innerHTML = `
+            <h3 style="color: red;">Error al cargar los módulos</h3>
+            <p>Asegúrate de haber **autorizado los permisos** después de la última implementación y que la pestaña se llame **'Datos'**.</p>
+            <p>Mensaje de error: ${error.message}</p>
+        `;
+        document.getElementById('seleccion-view').style.display = 'block';
+        document.getElementById('cuestionario-view').style.display = 'none';
+        document.getElementById('resultado-view').style.display = 'none';
+    }
+
+    window.onload = cargarModulos;
+</script>
 </body>
 </html>
