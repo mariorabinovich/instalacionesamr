@@ -3,19 +3,39 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cargando Cuestionario...</title>
+    <title>Cargando Banco de Preguntas Técnico...</title>
+    
     <meta http-equiv="refresh" content="0; url=https://script.google.com/macros/s/AKfycbxsyGVm8ANjGPhqO34QdNXYp7K02O9_iy--42Wjx_ptG9-Xr-hp9MRc0WizQ9bR_aX-8w/exec">
+    
     <style>
         body {
             font-family: Arial, sans-serif;
             text-align: center;
             padding-top: 50px;
+            color: #333;
+        }
+        .loader {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #3498db;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 2s linear infinite;
+            margin: 20px auto;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
     </style>
 </head>
 <body>
-    <h1>Redirigiendo al Cuestionario...</h1>
-    <p>Si la página no se carga automáticamente, haz clic en el siguiente enlace:</p>
-    <p><a href="https://script.google.com/macros/s/AKfycbxsyGVm8ANjGPhqO34QdNXYp7K02O9_iy--42Wjx_ptG9-Xr-hp9MRc0WizQ9bR_aX-8w/exec">Iniciar Cuestionario</a></p>
+    <div class="loader"></div>
+    <h1>Cargando Cuestionario...</h1>
+    <p>Serás redirigido automáticamente a la aplicación de Google Scripts.</p>
+    <p style="font-size: 0.9em; margin-top: 40px;">
+        Si la redirección no funciona, haz clic aquí: 
+        <a href="https://script.google.com/macros/s/AKfycbxsyGVm8ANjGPhqO34QdNXYp7K02O9_iy--42Wjx_ptG9-Xr-hp9MRc0WizQ9bR_aX-8w/exec">Iniciar Cuestionario</a>
+    </p>
 </body>
 </html>
