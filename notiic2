@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="refresh" content="0; url=https://script.google.com/macros/s/AKfycbxXfHaOoAPnj9XY4AozIaokQ9lz7v6dsBKCO6svV5nAtT8uaYVSF9MpHfaNAo9frMs7/exec" />
+    <title>Redireccionando al Cuestionario...</title>
+    <style>
+        body { font-family: Arial, sans-serif; text-align: center; padding-top: 50px; }
+        .mensaje { color: #555; }
+    </style>
+</head>
+<body>
+    <div class="mensaje">
+        <p>Estás siendo redirigido al cuestionario técnico.</p>
+        <p>Si no sucede automáticamente, haz clic aquí:</p>
+        <a href="https://script.google.com/macros/s/AKfycbxXfHaOoAPnj9XY4AozIaokQ9lz7v6dsBKCO6svV5nAtT8uaYVSF9MpHfaNAo9frMs7/exec">Acceder al Cuestionario</a>
+    </div>
+</body>
+</html>
