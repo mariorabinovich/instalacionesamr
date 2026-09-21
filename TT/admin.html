@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Administración · Verificación Higrotérmica</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:#0B0F16; --bg-elevated:#10151F; --panel:#151B26; --panel-2:#1B222F; --panel-3:#212939;
+  --border:#29303F; --border-soft:#1E2530; --text:#EAEDF3; --text-soft:#9AA4B8; --text-faint:#5D6577;
+  --cold:#4FA8DD; --warm:#E8A34E; --warm-dim:#8C6430;
+  --ok:#56C08A; --ok-bg:rgba(86,192,138,.12); --bad:#E2635F; --bad-bg:rgba(226,99,95,.12);
+  --warn:#E0BC4E; --warn-bg:rgba(224,188,78,.12);
+  --font-display:'Space Grotesk',sans-serif; --font-body:'IBM Plex Sans',sans-serif; --font-mono:'IBM Plex Mono',monospace;
+}
+*{box-sizing:border-box} html,body{margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:var(--font-body);font-size:14px;line-height:1.5;-webkit-font-smoothing:antialiased}
+.mono{font-family:var(--font-mono);font-variant-numeric:tabular-nums}
+button{font-family:var(--font-body);cursor:pointer}
+input,select{font-family:var(--font-body)}
+a{color:var(--cold)}
+::-webkit-scrollbar{width:10px;height:10px}::-webkit-scrollbar-thumb{background:var(--border);border-radius:8px}
+
+.topbar{display:flex;align-items:center;justify-content:space-between;padding:14px 22px;border-bottom:1px solid var(--border-soft);background:var(--bg-elevated);gap:16px;flex-wrap:wrap}
+.brand{display:flex;align-items:center;gap:12px}
+.brand .mark{width:36px;height:36px;border-radius:6px;background:linear-gradient(135deg,var(--warm),var(--warm-dim) 40%,#2E6690 65%,var(--cold));display:flex;align-items:center;justify-content:center;font-size:17px}
+.brand h1{font-family:var(--font-display);font-size:17px;margin:0;font-weight:600}
+.brand .sub{font-size:11.5px;color:var(--text-soft);display:block}
+.topbar-actions{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.who{font-size:12px;color:var(--text-soft);padding:6px 12px;background:var(--panel-2);border-radius:20px;border:1px solid var(--border-soft)}
+
+.btn{background:var(--panel-2);border:1px solid var(--border);color:var(--text);padding:9px 14px;border-radius:6px;font-size:13px;font-weight:500;display:inline-flex;align-items:center;gap:7px;transition:all .15s}
+.btn:hover{background:var(--panel-3);border-color:var(--text-faint)}
+.btn:disabled{opacity:.35;cursor:default}
+.btn-primary{background:var(--warm-dim);border-color:var(--warm);color:#FFF3E4}
+.btn-primary:hover{background:#9A6E36}
+.btn-sm{padding:5px 10px;font-size:12px}
+.btn-danger{background:transparent;border-color:transparent;color:var(--text-faint)}
+.btn-danger:hover{background:var(--bad-bg);color:var(--bad)}
+
+.wrap{max-width:1250px;margin:0 auto;padding:22px}
+.tabs{display:flex;gap:4px;background:var(--panel-2);padding:3px;border-radius:9px;margin-bottom:20px;width:fit-content}
+.tab{background:none;border:none;color:var(--text-faint);padding:8px 18px;border-radius:6px;font-size:13px;font-weight:600}
+.tab.active{background:var(--panel-3);color:var(--warm)}
+.view{display:none} .view.active{display:block}
+
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-bottom:20px}
+.stat{background:var(--panel);border:1px solid var(--border-soft);border-radius:10px;padding:14px}
+.stat .lbl{font-size:10.5px;text-transform:uppercase;letter-spacing:.4px;color:var(--text-faint)}
+.stat .val{font-family:var(--font-display);font-size:26px;font-weight:700;margin-top:3px}
+.stat.ok .val{color:var(--ok)} .stat.bad .val{color:var(--bad)} .stat.warm .val{color:var(--warm)}
+
+.card{background:var(--panel);border:1px solid var(--border-soft);border-radius:12px;padding:18px;margin-bottom:18px}
+.card h2{font-family:var(--font-display);font-size:14px;text-transform:uppercase;letter-spacing:.5px;color:var(--text-soft);margin:0 0 14px}
+
+table{width:100%;border-collapse:collapse;font-size:12.5px}
+th{text-align:left;font-size:10.5px;text-transform:uppercase;letter-spacing:.3px;color:var(--text-faint);padding:8px;border-bottom:1px solid var(--border)}
+td{padding:9px 8px;border-bottom:1px solid var(--border-soft);vertical-align:middle}
+tr:hover td{background:rgba(255,255,255,.015)}
+.tag{font-size:10px;padding:2px 8px;border-radius:20px;font-weight:600;text-transform:uppercase;letter-spacing:.3px}
+.tag.admin{background:var(--warm-dim);color:#FFF3E4}
+.tag.user{background:var(--panel-3);color:var(--text-soft)}
+.tag.on{background:var(--ok-bg);color:var(--ok)}
+.tag.off{background:var(--bad-bg);color:var(--bad)}
+.tag.warn{background:var(--warn-bg);color:var(--warn)}
+
+.field{margin-bottom:12px}
+.field label{display:block;font-size:11.5px;color:var(--text-soft);margin-bottom:5px}
+.field input,.field select{width:100%;background:var(--bg-elevated);border:1px solid var(--border);color:var(--text);padding:9px 11px;border-radius:6px;font-size:13px}
+.field input:focus,.field select:focus{outline:none;border-color:var(--warm-dim)}
+.field .hint{font-size:10.5px;color:var(--text-faint);margin-top:4px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:0 14px}
+
+.modal-bg{position:fixed;inset:0;background:rgba(5,7,11,.75);backdrop-filter:blur(3px);display:flex;align-items:center;justify-content:center;z-index:100;padding:20px}
+.modal-bg.hidden{display:none}
+.modal{background:var(--bg-elevated);border:1px solid var(--border);border-radius:14px;width:100%;max-width:520px;max-height:86vh;display:flex;flex-direction:column}
+.modal-head{display:flex;justify-content:space-between;align-items:center;padding:16px 20px;border-bottom:1px solid var(--border-soft)}
+.modal-head h3{font-family:var(--font-display);font-size:15px;margin:0}
+.modal-body{padding:18px 20px;overflow-y:auto}
+.modal-foot{padding:14px 20px;border-top:1px solid var(--border-soft);display:flex;justify-content:flex-end;gap:8px}
+.x{background:none;border:none;color:var(--text-faint);font-size:20px;padding:2px 8px;border-radius:5px}
+.x:hover{background:var(--panel-2);color:var(--text)}
+
+.msg{padding:10px 13px;border-radius:8px;font-size:12.5px;margin-bottom:14px}
+.msg.err{background:var(--bad-bg);color:var(--bad);border:1px solid rgba(226,99,95,.3)}
+.msg.ok{background:var(--ok-bg);color:var(--ok);border:1px solid rgba(86,192,138,.3)}
+.msg.warn{background:var(--warn-bg);color:var(--warn);border:1px solid rgba(224,188,78,.3)}
+.hidden{display:none!important}
+
+.log-filters{display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap;align-items:center}
+.log-filters input,.log-filters select{background:var(--bg-elevated);border:1px solid var(--border);color:var(--text);padding:7px 10px;border-radius:6px;font-size:12.5px}
+.ev{font-size:10.5px;padding:2px 8px;border-radius:5px;font-weight:600;white-space:nowrap}
+.ev.login_ok{background:var(--ok-bg);color:var(--ok)}
+.ev.login_fail,.ev.export_denied,.ev.admin_denied,.ev.login_blocked_ip,.ev.password_change_fail{background:var(--bad-bg);color:var(--bad)}
+.ev.export_excel,.ev.export_report,.ev.export_design{background:rgba(79,168,221,.12);color:var(--cold)}
+.ev.user_create,.ev.user_update,.ev.user_delete,.ev.password_change_ok,.ev.bootstrap_admin{background:var(--warn-bg);color:var(--warn)}
+.ev.logout{background:var(--panel-3);color:var(--text-soft)}
+.ua{font-size:10px;color:var(--text-faint);max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;display:block}
+.empty{text-align:center;padding:40px;color:var(--text-faint);font-size:13px}
+@media (max-width:760px){ .grid2{grid-template-columns:1fr} .hide-sm{display:none} }
+</style>
+</head>
+<body>
+<header class="topbar">
+  <div class="brand">
+    <div class="mark">⚙</div>
+    <div>
+      <h1>Administración</h1>
+      <span class="sub">Verificación Higrotérmica · usuarios y accesos</span>
+    </div>
+  </div>
+  <div class="topbar-actions">
+    <span class="who" id="who">…</span>
+    <a class="btn" href="/">← Volver a la app</a>
+    <button class="btn" id="btn-logout">Cerrar sesión</button>
+  </div>
+</header>
+
+<div class="wrap">
+  <div class="tabs">
+    <button class="tab active" data-view="usuarios">👥 Usuarios</button>
+    <button class="tab" data-view="registro">📋 Registro de accesos</button>
+  </div>
+
+  <!-- ============ USUARIOS ============ -->
+  <section class="view active" id="view-usuarios">
+    <div id="msg-users"></div>
+    <div class="card">
+      <h2>Usuarios autorizados <button class="btn btn-primary btn-sm" id="btn-new" style="float:right;margin-top:-4px;">+ Nuevo usuario</button></h2>
+      <div style="overflow-x:auto;">
+        <table>
+          <thead><tr>
+            <th>Usuario</th><th class="hide-sm">Nombre</th><th>Rol</th><th>Estado</th>
+            <th class="hide-sm">Último acceso</th><th class="hide-sm">Última IP</th><th class="hide-sm">Accesos</th><th></th>
+          </tr></thead>
+          <tbody id="users-tbody"><tr><td colspan="8" class="empty">Cargando…</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ REGISTRO ============ -->
+  <section class="view" id="view-registro">
+    <div class="stats" id="log-stats"></div>
+    <div class="card">
+      <h2>Registro de accesos y acciones</h2>
+      <div class="log-filters">
+        <input type="text" id="f-user" placeholder="Filtrar por usuario…">
+        <select id="f-event">
+          <option value="">Todos los eventos</option>
+          <option value="login_ok">Ingresos correctos</option>
+          <option value="login_fail">Ingresos fallidos</option>
+          <option value="logout">Cierres de sesión</option>
+          <option value="export_excel">Exportación Excel</option>
+          <option value="export_report">Informes</option>
+          <option value="export_design">Exportación diseño</option>
+          <option value="export_denied">Exportación denegada</option>
+          <option value="user_create">Alta de usuario</option>
+          <option value="user_update">Modificación de usuario</option>
+          <option value="user_delete">Baja de usuario</option>
+          <option value="password_change_ok">Cambio de contraseña</option>
+          <option value="admin_denied">Acceso admin denegado</option>
+        </select>
+        <select id="f-limit">
+          <option value="100">Últimos 100</option>
+          <option value="200" selected>Últimos 200</option>
+          <option value="500">Últimos 500</option>
+          <option value="1000">Últimos 1000</option>
+        </select>
+        <button class="btn btn-sm" id="btn-reload">↻ Actualizar</button>
+        <button class="btn btn-sm" id="btn-csv">⬇ Descargar CSV</button>
+      </div>
+      <div style="overflow-x:auto;">
+        <table>
+          <thead><tr><th>Fecha y hora</th><th>Evento</th><th>Usuario</th><th>IP</th><th class="hide-sm">Detalle</th><th class="hide-sm">Navegador</th></tr></thead>
+          <tbody id="log-tbody"><tr><td colspan="6" class="empty">Cargando…</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+</div>
+
+<!-- ============ MODAL USUARIO ============ -->
+<div class="modal-bg hidden" id="modal-user">
+  <div class="modal">
+    <div class="modal-head"><h3 id="modal-title">Nuevo usuario</h3><button class="x" data-close>×</button></div>
+    <div class="modal-body">
+      <div id="modal-msg"></div>
+      <div class="field">
+        <label>Usuario (para iniciar sesión)</label>
+        <input type="text" id="u-username" autocomplete="off" placeholder="ej: jperez">
+        <div class="hint">Entre 3 y 32 caracteres. Letras, números, punto, guion y guion bajo.</div>
+      </div>
+      <div class="grid2">
+        <div class="field"><label>Nombre y apellido</label><input type="text" id="u-nombre" placeholder="ej: Juan Pérez"></div>
+        <div class="field"><label>Email (opcional)</label><input type="email" id="u-email" placeholder="ej: jperez@estudio.com"></div>
+      </div>
+      <div class="grid2">
+        <div class="field">
+          <label>Rol</label>
+          <select id="u-role">
+            <option value="user">Usuario — puede exportar</option>
+            <option value="admin">Administrador — además gestiona usuarios</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Estado</label>
+          <select id="u-active"><option value="1">Activo</option><option value="0">Desactivado</option></select>
+        </div>
+      </div>
+      <div class="field">
+        <label id="pwd-label">Contraseña</label>
+        <input type="text" id="u-password" autocomplete="new-password" placeholder="mínimo 8 caracteres, con letras y números">
+        <div class="hint" id="pwd-hint">El usuario deberá cambiarla la primera vez que ingrese. Anotala para entregársela: no se puede volver a ver.</div>
+        <button class="btn btn-sm" id="btn-gen" style="margin-top:7px;">🎲 Generar contraseña segura</button>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn" data-close>Cancelar</button>
+      <button class="btn btn-primary" id="btn-save">Guardar</button>
+    </div>
+  </div>
+</div>
+
+<script>
+'use strict';
+let currentUser = null, usersCache = [], editingId = null;
+
+const $ = (id) => document.getElementById(id);
+const esc = (s) => { const d = document.createElement('div'); d.textContent = s == null ? '' : s; return d.innerHTML; };
+const fechaHora = (iso) => { try { return new Date(iso).toLocaleString('es-AR', { day:'2-digit', month:'2-digit', year:'2-digit', hour:'2-digit', minute:'2-digit', second:'2-digit' }); } catch(e){ return iso || ''; } };
+
+function showMsg(el, text, kind) {
+  el.innerHTML = text ? `<div class="msg ${kind || 'err'}">${esc(text)}</div>` : '';
+}
+
+async function api(url, opts) {
+  const r = await fetch(url, Object.assign({ credentials: 'same-origin', headers: { 'Content-Type': 'application/json' } }, opts || {}));
+  if (r.status === 401 || r.status === 403) { location.href = '/?admin=1'; throw new Error('sin sesión'); }
+  const data = await r.json().catch(() => ({}));
+  if (!r.ok || data.ok === false) throw new Error(data.error || 'Error del servidor');
+  return data;
+}
+
+// ---------------- Sesión ----------------
+async function loadSession() {
+  const d = await api('/api/session');
+  if (!d.authed || !d.user || d.user.role !== 'admin') { location.href = '/?admin=1'; return; }
+  currentUser = d.user;
+  $('who').textContent = `${d.user.username}${d.user.nombre ? ' · ' + d.user.nombre : ''}`;
+}
+
+// ---------------- Usuarios ----------------
+async function loadUsers() {
+  const tb = $('users-tbody');
+  try {
+    const d = await api('/api/admin/users');
+    usersCache = d.users;
+    if (!usersCache.length) { tb.innerHTML = '<tr><td colspan="8" class="empty">No hay usuarios.</td></tr>'; return; }
+    tb.innerHTML = usersCache.map((u) => {
+      const bloqueado = u.lockedUntil && new Date(u.lockedUntil) > new Date();
+      return `<tr>
+        <td><b class="mono">${esc(u.username)}</b>${u.mustChangePassword ? ' <span class="tag warn">clave inicial</span>' : ''}${bloqueado ? ' <span class="tag off">bloqueado</span>' : ''}</td>
+        <td class="hide-sm">${esc(u.nombre) || '—'}${u.email ? `<br><span class="ua">${esc(u.email)}</span>` : ''}</td>
+        <td><span class="tag ${u.role}">${u.role === 'admin' ? 'Admin' : 'Usuario'}</span></td>
+        <td><span class="tag ${u.active ? 'on' : 'off'}">${u.active ? 'Activo' : 'Inactivo'}</span></td>
+        <td class="hide-sm mono" style="font-size:11px;">${u.lastLoginAt ? fechaHora(u.lastLoginAt) : '—'}</td>
+        <td class="hide-sm mono" style="font-size:11px;">${esc(u.lastLoginIP) || '—'}</td>
+        <td class="hide-sm mono">${u.loginCount || 0}</td>
+        <td style="text-align:right;white-space:nowrap;">
+          <button class="btn btn-sm" data-edit="${u.id}">Editar</button>
+          <button class="btn btn-sm btn-danger" data-del="${u.id}" title="Eliminar">🗑</button>
+        </td></tr>`;
+    }).join('');
+    tb.querySelectorAll('[data-edit]').forEach((b) => b.addEventListener('click', () => openUser(b.dataset.edit)));
+    tb.querySelectorAll('[data-del]').forEach((b) => b.addEventListener('click', () => delUser(b.dataset.del)));
+  } catch (e) {
+    tb.innerHTML = `<tr><td colspan="8" class="empty">${esc(e.message)}</td></tr>`;
+  }
+}
+
+function openUser(id) {
+  editingId = id || null;
+  showMsg($('modal-msg'), '');
+  const u = id ? usersCache.find((x) => x.id === id) : null;
+  $('modal-title').textContent = u ? `Editar: ${u.username}` : 'Nuevo usuario';
+  $('u-username').value = u ? u.username : '';
+  $('u-username').disabled = !!u; // el nombre de usuario no se cambia
+  $('u-nombre').value = u ? (u.nombre || '') : '';
+  $('u-email').value = u ? (u.email || '') : '';
+  $('u-role').value = u ? u.role : 'user';
+  $('u-active').value = u ? (u.active ? '1' : '0') : '1';
+  $('u-password').value = '';
+  $('pwd-label').textContent = u ? 'Nueva contraseña (dejar vacío para no cambiarla)' : 'Contraseña';
+  $('pwd-hint').textContent = u
+    ? 'Si la cambiás, el usuario deberá elegir una nueva al ingresar. No se puede ver la contraseña actual.'
+    : 'El usuario deberá cambiarla la primera vez que ingrese. Anotala para entregársela: no se puede volver a ver.';
+  $('modal-user').classList.remove('hidden');
+  setTimeout(() => { if (!u) $('u-username').focus(); }, 50);
+}
+
+async function saveUser() {
+  const btn = $('btn-save');
+  btn.disabled = true;
+  showMsg($('modal-msg'), '');
+  const payload = {
+    nombre: $('u-nombre').value.trim(),
+    email: $('u-email').value.trim(),
+    role: $('u-role').value,
+    active: $('u-active').value === '1',
+  };
+  const pwd = $('u-password').value;
+  try {
+    if (editingId) {
+      if (pwd) payload.password = pwd;
+      await api('/api/admin/users/' + editingId, { method: 'PATCH', body: JSON.stringify(payload) });
+    } else {
+      payload.username = $('u-username').value.trim();
+      payload.password = pwd;
+      await api('/api/admin/users', { method: 'POST', body: JSON.stringify(payload) });
+    }
+    $('modal-user').classList.add('hidden');
+    showMsg($('msg-users'), editingId ? 'Usuario actualizado.' : 'Usuario creado. Entregale la contraseña que anotaste.', 'ok');
+    setTimeout(() => showMsg($('msg-users'), ''), 6000);
+    loadUsers();
+  } catch (e) {
+    showMsg($('modal-msg'), e.message, 'err');
+  } finally { btn.disabled = false; }
+}
+
+async function delUser(id) {
+  const u = usersCache.find((x) => x.id === id);
+  if (!u) return;
+  if (!confirm(`¿Eliminar al usuario "${u.username}"?\n\nEsta acción no se puede deshacer. El registro de accesos previo se conserva.`)) return;
+  try {
+    await api('/api/admin/users/' + id, { method: 'DELETE' });
+    showMsg($('msg-users'), `Usuario "${u.username}" eliminado.`, 'ok');
+    setTimeout(() => showMsg($('msg-users'), ''), 5000);
+    loadUsers();
+  } catch (e) { showMsg($('msg-users'), e.message, 'err'); }
+}
+
+function generarClave() {
+  const abc = 'abcdefghijkmnopqrstuvwxyz';
+  const ABC = 'ABCDEFGHJKLMNPQRSTUVWXYZ';
+  const num = '23456789';
+  const all = abc + ABC + num;
+  let out = '';
+  const rnd = (s) => s[Math.floor(Math.random() * s.length)];
+  out += rnd(ABC) + rnd(abc) + rnd(num);
+  for (let i = 0; i < 9; i++) out += rnd(all);
+  $('u-password').value = out.split('').sort(() => Math.random() - 0.5).join('');
+}
+
+// ---------------- Registro ----------------
+const EVENT_LABEL = {
+  login_ok: 'Ingreso', login_fail: 'Ingreso fallido', logout: 'Cierre de sesión',
+  login_blocked_ip: 'IP bloqueada', export_excel: 'Excel', export_report: 'Informe',
+  export_design: 'Diseño', export_denied: 'Exportación denegada',
+  user_create: 'Alta usuario', user_update: 'Cambio usuario', user_delete: 'Baja usuario',
+  password_change_ok: 'Cambió su clave', password_change_fail: 'Falló cambio de clave',
+  admin_denied: 'Admin denegado', bootstrap_admin: 'Admin inicial',
+};
+let logCache = [];
+
+async function loadLog() {
+  const tb = $('log-tbody');
+  const params = new URLSearchParams();
+  params.set('limit', $('f-limit').value);
+  if ($('f-user').value.trim()) params.set('username', $('f-user').value.trim());
+  if ($('f-event').value) params.set('event', $('f-event').value);
+  try {
+    const d = await api('/api/admin/log?' + params.toString());
+    logCache = d.entries;
+    const s = d.stats || {};
+    $('log-stats').innerHTML = `
+      <div class="stat ok"><span class="lbl">Ingresos (24 h)</span><span class="val">${s.loginsOk24h || 0}</span></div>
+      <div class="stat bad"><span class="lbl">Fallidos (24 h)</span><span class="val">${s.loginsFail24h || 0}</span></div>
+      <div class="stat warm"><span class="lbl">Exportaciones (24 h)</span><span class="val">${s.exports24h || 0}</span></div>
+      <div class="stat"><span class="lbl">IPs únicas (24 h)</span><span class="val">${s.ipsUnicas24h || 0}</span></div>
+      <div class="stat"><span class="lbl">Eventos registrados</span><span class="val">${s.total || 0}</span></div>`;
+    if (!logCache.length) { tb.innerHTML = '<tr><td colspan="6" class="empty">Sin eventos para este filtro.</td></tr>'; return; }
+    tb.innerHTML = logCache.map((e) => {
+      const det = [];
+      if (e.motivo) det.push('motivo: ' + e.motivo);
+      if (e.objetivo) det.push('→ ' + e.objetivo);
+      if (e.cambios) det.push('campos: ' + e.cambios);
+      if (e.muro) det.push('muro: ' + e.muro);
+      if (e.proyecto) det.push('proy: ' + e.proyecto);
+      if (e.ruta) det.push(e.ruta);
+      if (e.rol) det.push('rol: ' + e.rol);
+      return `<tr>
+        <td class="mono" style="font-size:11px;white-space:nowrap;">${fechaHora(e.at)}</td>
+        <td><span class="ev ${esc(e.event)}">${esc(EVENT_LABEL[e.event] || e.event)}</span></td>
+        <td class="mono">${esc(e.username) || '—'}</td>
+        <td class="mono" style="font-size:11px;">${esc(e.ip) || '—'}</td>
+        <td class="hide-sm" style="font-size:11px;color:var(--text-soft);">${esc(det.join(' · ')) || '—'}</td>
+        <td class="hide-sm"><span class="ua" title="${esc(e.ua)}">${esc(e.ua) || '—'}</span></td>
+      </tr>`;
+    }).join('');
+  } catch (e) {
+    tb.innerHTML = `<tr><td colspan="6" class="empty">${esc(e.message)}</td></tr>`;
+  }
+}
+
+function descargarCSV() {
+  if (!logCache.length) { alert('No hay eventos para descargar con el filtro actual.'); return; }
+  const cab = ['Fecha y hora', 'Evento', 'Usuario', 'IP', 'Motivo', 'Objetivo', 'Cambios', 'Muro', 'Proyecto', 'Navegador'];
+  const q = (v) => '"' + String(v == null ? '' : v).replace(/"/g, '""') + '"';
+  const filas = logCache.map((e) => [
+    fechaHora(e.at), EVENT_LABEL[e.event] || e.event, e.username || '', e.ip || '',
+    e.motivo || '', e.objetivo || '', e.cambios || '', e.muro || '', e.proyecto || '', e.ua || '',
+  ].map(q).join(','));
+  // BOM para que Excel abra bien los acentos
+  const blob = new Blob(['\ufeff' + cab.map(q).join(',') + '\n' + filas.join('\n')], { type: 'text/csv;charset=utf-8;' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'registro_accesos_' + new Date().toISOString().slice(0, 10) + '.csv';
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(a.href), 10000);
+}
+
+// ---------------- Eventos ----------------
+document.querySelectorAll('.tab').forEach((t) => t.addEventListener('click', () => {
+  document.querySelectorAll('.tab').forEach((x) => x.classList.remove('active'));
+  document.querySelectorAll('.view').forEach((x) => x.classList.remove('active'));
+  t.classList.add('active');
+  $('view-' + t.dataset.view).classList.add('active');
+  if (t.dataset.view === 'registro') loadLog();
+}));
+document.querySelectorAll('[data-close]').forEach((b) => b.addEventListener('click', () => $('modal-user').classList.add('hidden')));
+$('modal-user').addEventListener('click', (e) => { if (e.target === $('modal-user')) $('modal-user').classList.add('hidden'); });
+document.addEventListener('keydown', (e) => { if (e.key === 'Escape') $('modal-user').classList.add('hidden'); });
+$('btn-new').addEventListener('click', () => openUser(null));
+$('btn-save').addEventListener('click', saveUser);
+$('btn-gen').addEventListener('click', generarClave);
+$('btn-reload').addEventListener('click', loadLog);
+$('btn-csv').addEventListener('click', descargarCSV);
+$('f-user').addEventListener('keydown', (e) => { if (e.key === 'Enter') loadLog(); });
+$('f-event').addEventListener('change', loadLog);
+$('f-limit').addEventListener('change', loadLog);
+$('btn-logout').addEventListener('click', async () => {
+  await fetch('/api/logout', { method: 'POST', credentials: 'same-origin' });
+  location.href = '/';
+});
+
+(async () => { await loadSession(); await loadUsers(); })();
+</script>
+</body>
+</html>

@@ -1,0 +1,16 @@
+{
+  "name": "verificacion-higrotermica",
+  "version": "13.0.0",
+  "description": "Cálculo de transmitancia térmica y verificación de condensación según IRAM 11601/11603/11605/11625 y Código de Edificación CABA",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "xlsx": "0.18.5"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "private": true
+}

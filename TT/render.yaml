@@ -1,0 +1,24 @@
+# Despliegue en Render (https://render.com) — "Blueprint"
+# Subí el proyecto a GitHub y en Render elegí "New > Blueprint".
+services:
+  - type: web
+    name: verificacion-higrotermica
+    runtime: node
+    plan: free           # el plan gratuito se duerme tras inactividad
+    buildCommand: npm install
+    startCommand: node server.js
+    envVars:
+      - key: VH_SESSION_SECRET
+        generateValue: true      # Render genera un secreto aleatorio y lo fija
+      - key: VH_SECURE_COOKIE
+        value: "1"               # Render sirve por HTTPS
+      - key: VH_ADMIN_USER
+        value: admin
+      - key: VH_ADMIN_PASSWORD
+        sync: false              # se carga a mano en el panel de Render
+      - key: VH_DATA_DIR
+        value: /var/data
+    disk:
+      name: datos
+      mountPath: /var/data       # disco persistente: conserva usuarios y registro
+      sizeGB: 1
