@@ -1,5 +1,18 @@
 # Despliegue en Render (https://render.com) — "Blueprint"
 # Subí el proyecto a GitHub y en Render elegí "New > Blueprint".
+#
+# IMPORTANTE sobre persistencia en el plan gratuito:
+# El plan free de Render NO admite disco persistente (por eso fallaba el
+# despliegue con la versión anterior de este archivo). Sin disco, cualquier
+# dato guardado en el sistema de archivos del contenedor se pierde en cada
+# redespliegue.
+#
+# Para que los usuarios y el registro de accesos sobrevivan de verdad en el
+# plan gratuito, esta app soporta guardar los datos en una base Postgres
+# externa (gratis de forma permanente en Neon, Supabase u otro proveedor):
+# definí la variable DATABASE_URL con la cadena de conexión y la app usa
+# Postgres automáticamente en vez de archivos locales. Instrucciones paso a
+# paso en LEEME.md, sección 3.
 services:
   - type: web
     name: verificacion-higrotermica
@@ -16,9 +29,5 @@ services:
         value: admin
       - key: VH_ADMIN_PASSWORD
         sync: false              # se carga a mano en el panel de Render
-      - key: VH_DATA_DIR
-        value: /var/data
-    disk:
-      name: datos
-      mountPath: /var/data       # disco persistente: conserva usuarios y registro
-      sizeGB: 1
+      - key: DATABASE_URL
+        sync: false              # cadena de conexión a Postgres (Neon, etc.) — ver LEEME.md

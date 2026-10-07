@@ -43,7 +43,7 @@ function signSession(userId, expiresAt) {
   const sig = crypto.createHmac('sha256', SESSION_SECRET).update(payload).digest('hex');
   return `${payload}.${sig}`;
 }
-function verifySession(token) {
+async function verifySession(token) {
   if (!token || typeof token !== 'string') return null;
   const parts = token.split('.');
   if (parts.length !== 3) return null;
@@ -53,7 +53,8 @@ function verifySession(token) {
   try { a = Buffer.from(sig, 'hex'); b = Buffer.from(expected, 'hex'); } catch (_) { return null; }
   if (a.length !== b.length || !crypto.timingSafeEqual(a, b)) return null;
   if (!(Date.now() < Number(expStr))) return null;
-  const user = store.loadUsers().find((u) => u.id === userId);
+  const users = await store.loadUsers();
+  const user = users.find((u) => u.id === userId);
   if (!user || !user.active) return null;
   return store.sanitize(user);
 }
@@ -65,7 +66,7 @@ function parseCookies(req) {
   });
   return out;
 }
-function currentUser(req) { return verifySession(parseCookies(req).vh_session); }
+async function currentUser(req) { return verifySession(parseCookies(req).vh_session); }
 function sessionCookie(token, maxAgeSec) {
   return `vh_session=${encodeURIComponent(token)}; HttpOnly; SameSite=Strict; Path=/;${SECURE_COOKIE ? ' Secure;' : ''} Max-Age=${maxAgeSec}`;
 }
@@ -308,7 +309,7 @@ const server = http.createServer(async (req, res) => {
   try {
     // ---------------- Sesión ----------------
     if (p === '/api/session' && req.method === 'GET') {
-      const u = currentUser(req);
+      const u = await currentUser(req);
       return sendJSON(res, 200, {
         authed: !!u,
         user: u ? { username: u.username, nombre: u.nombre, role: u.role, mustChangePassword: !!u.mustChangePassword } : null,
@@ -322,7 +323,7 @@ const server = http.createServer(async (req, res) => {
       }
       const body = await readJSON(req);
       if (!body) return sendJSON(res, 400, { ok: false, error: 'Petición inválida.' });
-      const r = store.authenticate(body.username, body.password);
+      const r = await store.authenticate(body.username, body.password);
       if (!r.ok) {
         noteIPAttempt(ip);
         store.logEvent({ event: 'login_fail', username: String(body.username || '').slice(0, 40), ip, ua: userAgent(req), motivo: r.reason });
@@ -331,7 +332,7 @@ const server = http.createServer(async (req, res) => {
           : 'Usuario o contraseña incorrectos.';
         return sendJSON(res, 401, { ok: false, error: msg });
       }
-      store.recordLoginIP(r.user.id, ip);
+      await store.recordLoginIP(r.user.id, ip);
       store.logEvent({ event: 'login_ok', username: r.user.username, ip, ua: userAgent(req), role: r.user.role });
       const exp = Date.now() + SESSION_TTL_MS;
       return sendJSON(res, 200, {
@@ -341,23 +342,23 @@ const server = http.createServer(async (req, res) => {
     }
 
     if (p === '/api/logout' && req.method === 'POST') {
-      const u = currentUser(req);
+      const u = await currentUser(req);
       if (u) store.logEvent({ event: 'logout', username: u.username, ip, ua: userAgent(req) });
       return sendJSON(res, 200, { ok: true }, { 'Set-Cookie': 'vh_session=; HttpOnly; SameSite=Strict; Path=/; Max-Age=0' });
     }
 
     if (p === '/api/change-password' && req.method === 'POST') {
-      const u = currentUser(req);
+      const u = await currentUser(req);
       if (!u) return sendJSON(res, 401, { ok: false, error: 'Sesión no válida.' });
       const body = await readJSON(req);
       if (!body) return sendJSON(res, 400, { ok: false, error: 'Petición inválida.' });
-      const full = store.loadUsers().find((x) => x.id === u.id);
+      const full = (await store.loadUsers()).find((x) => x.id === u.id);
       if (!store.verifyPassword(body.actual, full.passwordHash)) {
         store.logEvent({ event: 'password_change_fail', username: u.username, ip, ua: userAgent(req) });
         return sendJSON(res, 401, { ok: false, error: 'La contraseña actual no es correcta.' });
       }
       try {
-        store.updateUser(u.id, { password: body.nueva, mustChangePassword: false }, u.username);
+        await store.updateUser(u.id, { password: body.nueva, mustChangePassword: false }, u.username);
         store.logEvent({ event: 'password_change_ok', username: u.username, ip, ua: userAgent(req) });
         return sendJSON(res, 200, { ok: true });
       } catch (e) { return sendJSON(res, 400, { ok: false, error: e.message }); }
@@ -366,7 +367,7 @@ const server = http.createServer(async (req, res) => {
     // ---------------- Exportaciones (requieren sesión) ----------------
     if (p.indexOf('/api/export/') === 0) {
       if (req.method !== 'POST') { res.writeHead(405); return res.end('Método no permitido'); }
-      const u = currentUser(req);
+      const u = await currentUser(req);
       if (!u) {
         store.logEvent({ event: 'export_denied', ip, ua: userAgent(req), ruta: p });
         return sendJSON(res, 401, { ok: false, error: 'Necesitás iniciar sesión para exportar.' });
@@ -419,7 +420,7 @@ const server = http.createServer(async (req, res) => {
 
     // ---------------- Administración (requiere rol admin) ----------------
     if (p.indexOf('/api/admin/') === 0) {
-      const u = currentUser(req);
+      const u = await currentUser(req);
       if (!u) return sendJSON(res, 401, { ok: false, error: 'Sesión no válida.' });
       if (u.role !== 'admin') {
         store.logEvent({ event: 'admin_denied', username: u.username, ip, ua: userAgent(req), ruta: p });
@@ -427,13 +428,13 @@ const server = http.createServer(async (req, res) => {
       }
 
       if (p === '/api/admin/users' && req.method === 'GET') {
-        return sendJSON(res, 200, { ok: true, users: store.listUsers() });
+        return sendJSON(res, 200, { ok: true, users: await store.listUsers() });
       }
       if (p === '/api/admin/users' && req.method === 'POST') {
         const b = await readJSON(req);
         if (!b) return sendJSON(res, 400, { ok: false, error: 'Petición inválida.' });
         try {
-          const nu = store.createUser({
+          const nu = await store.createUser({
             username: b.username, password: b.password, role: b.role || 'user',
             nombre: b.nombre, email: b.email, createdBy: u.username,
           });
@@ -446,7 +447,7 @@ const server = http.createServer(async (req, res) => {
         const b = await readJSON(req);
         if (!b) return sendJSON(res, 400, { ok: false, error: 'Petición inválida.' });
         try {
-          const nu = store.updateUser(id, b, u.username);
+          const nu = await store.updateUser(id, b, u.username);
           const cambios = Object.keys(b).filter((k) => k !== 'password');
           if (b.password) cambios.push('password');
           store.logEvent({ event: 'user_update', username: u.username, ip, ua: userAgent(req), objetivo: nu.username, cambios: cambios.join(',') });
@@ -455,9 +456,9 @@ const server = http.createServer(async (req, res) => {
       }
       if (p.indexOf('/api/admin/users/') === 0 && req.method === 'DELETE') {
         const id = p.split('/').pop();
-        const target = store.loadUsers().find((x) => x.id === id);
+        const target = (await store.loadUsers()).find((x) => x.id === id);
         try {
-          store.deleteUser(id);
+          await store.deleteUser(id);
           store.logEvent({ event: 'user_delete', username: u.username, ip, ua: userAgent(req), objetivo: target ? target.username : id });
           return sendJSON(res, 200, { ok: true });
         } catch (e) { return sendJSON(res, 400, { ok: false, error: e.message }); }
@@ -466,7 +467,7 @@ const server = http.createServer(async (req, res) => {
         const limit = Math.min(1000, Number(url.searchParams.get('limit') || 200));
         const username = url.searchParams.get('username') || null;
         const event = url.searchParams.get('event') || null;
-        return sendJSON(res, 200, { ok: true, entries: store.readLog({ limit, username, event }), stats: store.logStats() });
+        return sendJSON(res, 200, { ok: true, entries: await store.readLog({ limit, username, event }), stats: await store.logStats() });
       }
       return sendJSON(res, 404, { ok: false, error: 'Recurso de administración desconocido.' });
     }
@@ -474,7 +475,7 @@ const server = http.createServer(async (req, res) => {
     // ---------------- Estáticos ----------------
     if (req.method === 'GET' || req.method === 'HEAD') {
       if (p === '/admin' || p === '/admin.html') {
-        const u = currentUser(req);
+        const u = await currentUser(req);
         if (!u || u.role !== 'admin') { res.writeHead(302, { Location: '/?admin=1' }); return res.end(); }
         const data = fs.readFileSync(path.join(PUBLIC_DIR, 'admin.html'));
         res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8', 'Content-Length': data.length, 'Cache-Control': 'no-store' });
@@ -508,36 +509,59 @@ const server = http.createServer(async (req, res) => {
 // ---------------------------------------------------------------------------
 // Arranque
 // ---------------------------------------------------------------------------
-const boot = store.bootstrapAdmin();
-server.listen(PORT, HOST, () => {
-  console.log('');
-  console.log('  Verificación Higrotérmica — servidor activo');
-  console.log('  ==========================================');
-  console.log(`  URL:   http://${HOST === '0.0.0.0' ? 'localhost' : HOST}:${PORT}`);
-  console.log(`  Datos: ${store.DATA_DIR}`);
-  console.log('');
-  console.log('  Sin login:  diseñar, calcular, editar capas, visualizar.');
-  console.log('  Con login:  exportar Excel / informes / diseño.');
-  console.log('  Admin:      /admin  (usuarios y registro de accesos)');
-  if (boot) {
-    console.log('');
-    console.log('  +------------------------------------------------------+');
-    console.log('  |  PRIMER ARRANQUE - administrador creado               |');
-    console.log('  +------------------------------------------------------+');
-    console.log(`  |  Usuario:     ${boot.username}`);
-    console.log(`  |  Contrasena:  ${boot.password}`);
-    console.log('  +------------------------------------------------------+');
-    if (boot.generated) {
-      console.log('  |  Clave generada al azar: anotala ahora, no se vuelve  |');
-      console.log('  |  a mostrar. La app te pedira cambiarla al entrar.     |');
-    } else {
-      console.log('  |  Definida por VH_ADMIN_PASSWORD.                      |');
+// bootstrapAdmin() es async (puede ir a Postgres), así que se espera ANTES
+// de empezar a aceptar conexiones: si no, una petición podría llegar antes
+// de que exista el primer administrador.
+(async () => {
+  let boot = null;
+  try {
+    boot = await store.bootstrapAdmin();
+  } catch (e) {
+    console.error('');
+    console.error('  ✗ No se pudo inicializar el almacenamiento:', e.message);
+    if (store.backend === 'postgres') {
+      console.error('    Revisá que DATABASE_URL sea correcta y que la base acepte conexiones externas.');
     }
-    console.log('  +------------------------------------------------------+');
+    process.exit(1);
   }
-  if (!process.env.VH_SESSION_SECRET) {
+
+  server.listen(PORT, HOST, () => {
     console.log('');
-    console.log('  ! VH_SESSION_SECRET no definido: las sesiones se cierran al reiniciar.');
-  }
-  console.log('');
-});
+    console.log('  Verificación Higrotérmica — servidor activo');
+    console.log('  ==========================================');
+    console.log(`  URL:          http://${HOST === '0.0.0.0' ? 'localhost' : HOST}:${PORT}`);
+    console.log(`  Almacenamiento: ${store.backend === 'postgres' ? 'Postgres externo (DATABASE_URL)' : `archivos locales (${store.DATA_DIR})`}`);
+    console.log('');
+    console.log('  Sin login:  diseñar, calcular, editar capas, visualizar.');
+    console.log('  Con login:  exportar Excel / informes / diseño.');
+    console.log('  Admin:      /admin  (usuarios y registro de accesos)');
+    if (boot) {
+      console.log('');
+      console.log('  +------------------------------------------------------+');
+      console.log('  |  PRIMER ARRANQUE - administrador creado               |');
+      console.log('  +------------------------------------------------------+');
+      console.log(`  |  Usuario:     ${boot.username}`);
+      console.log(`  |  Contrasena:  ${boot.password}`);
+      console.log('  +------------------------------------------------------+');
+      if (boot.generated) {
+        console.log('  |  Clave generada al azar: anotala ahora, no se vuelve  |');
+        console.log('  |  a mostrar. La app te pedira cambiarla al entrar.     |');
+      } else {
+        console.log('  |  Definida por VH_ADMIN_PASSWORD.                      |');
+      }
+      console.log('  +------------------------------------------------------+');
+    }
+    if (store.backend === 'local' && process.env.PORT && !process.env.DATABASE_URL) {
+      console.log('');
+      console.log('  ! Corriendo en un hosting (PORT definido) SIN DATABASE_URL: si el');
+      console.log('    sistema de archivos es efímero (p. ej. Render free), los usuarios');
+      console.log('    y el registro de accesos se van a perder en el próximo despliegue.');
+      console.log('    Ver LEEME.md, sección 3, para conectar un Postgres gratuito.');
+    }
+    if (!process.env.VH_SESSION_SECRET) {
+      console.log('');
+      console.log('  ! VH_SESSION_SECRET no definido: las sesiones se cierran al reiniciar.');
+    }
+    console.log('');
+  });
+})();
