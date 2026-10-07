@@ -509,13 +509,19 @@ const server = http.createServer(async (req, res) => {
 // ---------------------------------------------------------------------------
 // Arranque
 // ---------------------------------------------------------------------------
-// bootstrapAdmin() es async (puede ir a Postgres), así que se espera ANTES
-// de empezar a aceptar conexiones: si no, una petición podría llegar antes
-// de que exista el primer administrador.
-(async () => {
+// Iniciar la escucha HTTP inmediatamente para que Render detecte el puerto de inmediato.
+server.listen(PORT, HOST, async () => {
+  console.log('');
+  console.log('  Verificación Higrotérmica — servidor activo');
+  console.log('  ==========================================');
+  console.log(`  URL:          http://${HOST === '0.0.0.0' ? 'localhost' : HOST}:${PORT}`);
+  console.log(`  Almacenamiento: ${store.backend === 'postgres' ? 'Postgres externo (DATABASE_URL)' : `archivos locales (${store.DATA_DIR})`}`);
+
   let boot = null;
   try {
+    console.log('  Inicializando base de datos...');
     boot = await store.bootstrapAdmin();
+    console.log('  ✓ Base de datos conectada e inicializada correctamente.');
   } catch (e) {
     console.error('');
     console.error('  ✗ No se pudo inicializar el almacenamiento:', e.message);
@@ -525,43 +531,36 @@ const server = http.createServer(async (req, res) => {
     process.exit(1);
   }
 
-  server.listen(PORT, HOST, () => {
+  console.log('');
+  console.log('  Sin login:  diseñar, calcular, editar capas, visualizar.');
+  console.log('  Con login:  exportar Excel / informes / diseño.');
+  console.log('  Admin:      /admin  (usuarios y registro de accesos)');
+  if (boot) {
     console.log('');
-    console.log('  Verificación Higrotérmica — servidor activo');
-    console.log('  ==========================================');
-    console.log(`  URL:          http://${HOST === '0.0.0.0' ? 'localhost' : HOST}:${PORT}`);
-    console.log(`  Almacenamiento: ${store.backend === 'postgres' ? 'Postgres externo (DATABASE_URL)' : `archivos locales (${store.DATA_DIR})`}`);
+    console.log('  +------------------------------------------------------+');
+    console.log('  |  PRIMER ARRANQUE - administrador creado               |');
+    console.log('  +------------------------------------------------------+');
+    console.log(`  |  Usuario:     ${boot.username}`);
+    console.log(`  |  Contrasena:  ${boot.password}`);
+    console.log('  +------------------------------------------------------+');
+    if (boot.generated) {
+      console.log('  |  Clave generada al azar: anotala ahora, no se vuelve  |');
+      console.log('  |  a mostrar. La app te pedira cambiarla al entrar.     |');
+    } else {
+      console.log('  |  Definida por VH_ADMIN_PASSWORD.                      |');
+    }
+    console.log('  +------------------------------------------------------+');
+  }
+  if (store.backend === 'local' && process.env.PORT && !process.env.DATABASE_URL) {
     console.log('');
-    console.log('  Sin login:  diseñar, calcular, editar capas, visualizar.');
-    console.log('  Con login:  exportar Excel / informes / diseño.');
-    console.log('  Admin:      /admin  (usuarios y registro de accesos)');
-    if (boot) {
-      console.log('');
-      console.log('  +------------------------------------------------------+');
-      console.log('  |  PRIMER ARRANQUE - administrador creado               |');
-      console.log('  +------------------------------------------------------+');
-      console.log(`  |  Usuario:     ${boot.username}`);
-      console.log(`  |  Contrasena:  ${boot.password}`);
-      console.log('  +------------------------------------------------------+');
-      if (boot.generated) {
-        console.log('  |  Clave generada al azar: anotala ahora, no se vuelve  |');
-        console.log('  |  a mostrar. La app te pedira cambiarla al entrar.     |');
-      } else {
-        console.log('  |  Definida por VH_ADMIN_PASSWORD.                      |');
-      }
-      console.log('  +------------------------------------------------------+');
-    }
-    if (store.backend === 'local' && process.env.PORT && !process.env.DATABASE_URL) {
-      console.log('');
-      console.log('  ! Corriendo en un hosting (PORT definido) SIN DATABASE_URL: si el');
-      console.log('    sistema de archivos es efímero (p. ej. Render free), los usuarios');
-      console.log('    y el registro de accesos se van a perder en el próximo despliegue.');
-      console.log('    Ver LEEME.md, sección 3, para conectar un Postgres gratuito.');
-    }
-    if (!process.env.VH_SESSION_SECRET) {
-      console.log('');
-      console.log('  ! VH_SESSION_SECRET no definido: las sesiones se cierran al reiniciar.');
-    }
+    console.log('  ! Corriendo en un hosting (PORT definido) SIN DATABASE_URL: si el');
+    console.log('    sistema de archivos es efímero (p. ej. Render free), los usuarios');
+    console.log('    y el registro de accesos se van a perder en el próximo despliegue.');
+    console.log('    Ver LEEME.md, sección 3, para conectar un Postgres gratuito.');
+  }
+  if (!process.env.VH_SESSION_SECRET) {
     console.log('');
-  });
-})();
+    console.log('  ! VH_SESSION_SECRET no definido: las sesiones se cierran al reiniciar.');
+  }
+  console.log('');
+});
