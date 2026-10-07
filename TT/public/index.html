@@ -3095,14 +3095,7 @@ async function doChangePassword() {
 }
 
 async function requireExportPassword(actionLabel, onSuccess) {
-  if (serverAvailable === null) await document.getElementById('btn-do-login').addEventListener('click', doLogin);
-document.getElementById('login-pass').addEventListener('keydown', e => { if (e.key === 'Enter') doLogin(); });
-document.getElementById('login-user').addEventListener('keydown', e => { if (e.key === 'Enter') document.getElementById('login-pass').focus(); });
-document.getElementById('btn-do-chpass').addEventListener('click', doChangePassword);
-document.getElementById('chpass-rep').addEventListener('keydown', e => { if (e.key === 'Enter') doChangePassword(); });
-
-checkServerSession();
-if (new URLSearchParams(location.search).get('admin') === '1') setTimeout(() => openLogin('entrar al panel de administración'), 300);
+  if (serverAvailable === null) await checkServerSession();
   if (!serverAvailable) { noServerMessage(); return; }
   if (sessionUser && sessionUser.mustChangePassword) { pendingAfterLogin = onSuccess; openChangePassword(true); return; }
   if (exportUnlocked) { onSuccess(); return; }
@@ -3205,7 +3198,18 @@ async function requestServerFile(endpoint, actionLabel, openInTab) {
   });
 }
 
-checkServerSession();
+document.getElementById('btn-do-login').addEventListener('click', doLogin);
+document.getElementById('login-pass').addEventListener('keydown', e => { if (e.key === 'Enter') doLogin(); });
+document.getElementById('login-user').addEventListener('keydown', e => { if (e.key === 'Enter') document.getElementById('login-pass').focus(); });
+document.getElementById('btn-do-chpass').addEventListener('click', doChangePassword);
+document.getElementById('chpass-rep').addEventListener('keydown', e => { if (e.key === 'Enter') doChangePassword(); });
+
+checkServerSession().then(() => {
+  // /?admin=1 es adonde redirige el servidor si entrás a /admin sin sesión
+  if (new URLSearchParams(location.search).get('admin') === '1' && serverAvailable && !exportUnlocked) {
+    openLogin('entrar al panel de administración');
+  }
+});
 
 document.getElementById('btn-iram-print').addEventListener('click', () => {
   closeModal('modal-iram');
